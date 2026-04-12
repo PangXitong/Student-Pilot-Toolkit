@@ -1,0 +1,50 @@
+<!--bmr-calculator.wxml-->
+<view class="container">
+  <view class="header">
+    <text class="title">基础代谢率计算器</text>
+  </view>
+  <view class="content">
+    <view class="input-section">
+      <view class="input-item">
+        <text class="label">性别</text>
+        <view class="gender-selector">
+          <view class="gender-option {{gender === 'male' ? 'selected' : ''}}" bindtap="onGenderSelect" data-gender="male">
+            <text class="gender-text">男</text>
+          </view>
+          <view class="gender-option {{gender === 'female' ? 'selected' : ''}}" bindtap="onGenderSelect" data-gender="female">
+            <text class="gender-text">女</text>
+          </view>
+        </view>
+      </view>
+      <view class="input-item">
+        <text class="label">体重 (kg)</text>
+        <input class="input" type="number" placeholder="请输入体重" bindinput="onWeightInput" value="{{weight}}" />
+      </view>
+      <view class="input-item">
+        <text class="label">身高 (cm)</text>
+        <input class="input" type="number" placeholder="请输入身高" bindinput="onHeightInput" value="{{height}}" />
+      </view>
+      <view class="input-item">
+        <text class="label">年龄 (周岁)</text>
+        <input class="input" type="number" placeholder="请输入年龄" bindinput="onAgeInput" value="{{age}}" />
+      </view>
+    </view>
+    
+    <button class="calculate-button" bindtap="calculateBMR">计算基础代谢率</button>
+    
+    <view class="result-section" wx:if="{{showResult}}">
+      <text class="result-label">您的基础代谢率</text>
+      <text class="result-value">{{bmrValue}} kcal/天</text>
+      <text class="result-description">{{bmrDescription}}</text>
+    </view>
+    
+    <button class="back-button" bindtap="goBack">返回首页</button>
+    
+    <view class="formula-section">
+      <text class="formula-title">计算公式</text>
+      <text class="formula-content">男性：BMR = 10 × 体重(kg) + 6.25 × 身高(cm) - 5 × 年龄(周岁) + 5</text>
+      <text class="formula-content">女性：BMR = 10 × 体重(kg) + 6.25 × 身高(cm) - 5 × 年龄(周岁) - 161</text>
+      <text class="formula-note">注：Mifhin-StJeor公式</text>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,74 @@
+<view class="container">
+  <view class="header">
+    <text class="title">心率计算器</text>
+  </view>
+  <view class="content">
+    <view class="input-section">
+      <view class="input-item">
+        <text class="label">年龄 (岁)</text>
+        <input class="input" type="number" placeholder="请输入年龄" bindinput="onAgeInput" value="{{age}}" />
+      </view>
+    </view>
+    
+    <button class="calculate-button" bindtap="calculateHeartRate">计算心率</button>
+    
+    <view class="result-section" wx:if="{{showResult}}">
+      <text class="result-label">您的心率范围</text>
+      <view class="basic-rates">
+        <view class="rate-item">
+          <text class="rate-label">最大心率建议</text>
+          <text class="rate-value">{{maxHeartRate}}</text>
+          <text class="rate-unit">次/分</text>
+        </view>
+      </view>
+      <view class="important-tip">
+        <text class="important-warning">重要提示：</text>
+        <text>此计算结果仅作为训练建议，不作为医学参考。</text>
+      </view>
+      
+      <view class="zones-section">
+        <text class="zones-title">运动心率区间建议</text>
+        <view class="zone-item" wx:for="{{heartRateZones}}" wx:key="name">
+          <view class="zone-header">
+            <text class="zone-name" style="color: {{item.color}}">{{item.name}}</text>
+            <text class="zone-range">{{item.min}} - {{item.max}} 次/分</text>
+          </view>
+          <text class="zone-description">{{item.description}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="history-section">
+      <view class="history-header">
+        <text class="history-title">历史记录</text>
+        <button class="clear-all-button" bindtap="clearAllHistory" wx:if="{{history.length > 0}}">清空全部</button>
+      </view>
+      <scroll-view class="history-list" scroll-y="true" wx:if="{{history.length > 0}}">
+        <view class="history-item" wx:for="{{history}}" wx:key="id">
+          <view class="history-info">
+            <text class="history-time">{{item.time}}</text>
+            <text class="history-data">年龄: {{item.age}}岁</text>
+          </view>
+          <view class="history-rate">
+            <text class="rate-value-history">{{item.maxHeartRate}}</text>
+            <text class="rate-unit-history">次/分</text>
+          </view>
+          <button class="delete-button" bindtap="deleteHistoryItem" data-id="{{item.id}}">删除</button>
+        </view>
+      </scroll-view>
+      <view class="history-empty" wx:if="{{history.length === 0}}">
+        <text class="empty-text">暂无历史记录</text>
+      </view>
+    </view>
+    
+    <button class="back-button" bindtap="goBack">返回首页</button>
+    
+    <view class="formula-section">
+      <text class="formula-title">计算公式</text>
+      <text class="formula-content">最大心率 = 220 - 年龄</text>
+      <text class="formula-content">目标心率 = 最大心率 × 强度百分比</text>
+      <text class="formula-content"><text class="important-warning">重要提示：</text>此计算结果仅作为训练建议，不作为医学参考。</text>
+      <text class="formula-note">注：使用 Tanaka 公式(208 - 0.7×年龄)作为备用公式</text>
+    </view>
+  </view>
+</view>

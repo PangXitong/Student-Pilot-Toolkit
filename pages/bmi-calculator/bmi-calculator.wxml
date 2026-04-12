@@ -1,0 +1,66 @@
+<!--bmi-calculator.wxml-->
+<view class="container">
+  <view class="header">
+    <text class="title">体质指数BMI计算器</text>
+  </view>
+  <view class="content">
+    <view class="input-section">
+      <view class="input-item">
+        <text class="label">身高 (cm)</text>
+        <input class="input" type="number" placeholder="请输入身高" bindinput="onHeightInput" value="{{height}}" />
+      </view>
+      <view class="input-item">
+        <text class="label">体重 (kg)</text>
+        <input class="input" type="number" placeholder="请输入体重" bindinput="onWeightInput" value="{{weight}}" />
+      </view>
+      <view class="input-item">
+        <text class="label">备注 (选填)</text>
+        <input class="input" type="text" placeholder="请输入备注信息" bindinput="onRemarkInput" value="{{remark}}" />
+      </view>
+    </view>
+    
+    <button class="calculate-button" bindtap="calculateBMI">计算BMI</button>
+    
+    <view class="result-section" wx:if="{{showResult}}">
+      <text class="result-label">您的BMI指数</text>
+      <text class="result-value">{{bmiValue}}</text>
+      <text class="result-category">{{bmiCategory}}</text>
+      <text class="result-description">{{bmiDescription}}</text>
+    </view>
+
+    <!-- 历史记录区域 -->
+    <view class="history-section">
+      <view class="history-header">
+        <text class="history-title">历史记录</text>
+        <button class="clear-all-button" bindtap="clearAllHistory" wx:if="{{history.length > 0}}">清空全部</button>
+      </view>
+      <scroll-view class="history-list" scroll-y="true" wx:if="{{history.length > 0}}">
+        <view class="history-item" wx:for="{{history}}" wx:key="id">
+          <view class="history-info">
+            <text class="history-time">{{item.time}}</text>
+            <text class="history-data">身高: {{item.height}}cm 体重: {{item.weight}}kg</text>
+          </view>
+          <view class="history-remark-container" wx:if="{{item.remark}}">
+            <text class="history-remark">备注: {{item.remark}}</text>
+          </view>
+          <view class="history-bmi">
+            <text class="bmi-value">{{item.bmi}}</text>
+            <text class="bmi-category">{{item.category}}</text>
+          </view>
+          <button class="delete-button" bindtap="deleteHistoryItem" data-id="{{item.id}}">删除</button>
+        </view>
+      </scroll-view>
+      <view class="history-empty" wx:if="{{history.length === 0}}">
+        <text class="empty-text">暂无历史记录</text>
+      </view>
+    </view>
+    
+    <button class="back-button" bindtap="goBack">返回首页</button>
+    
+    <view class="formula-section">
+      <text class="formula-title">计算公式</text>
+      <text class="formula-content">BMI = 体重(kg) / 身高(m)²</text>
+      <text class="formula-note">注：身高单位需转换为米</text>
+    </view>
+  </view>
+</view>

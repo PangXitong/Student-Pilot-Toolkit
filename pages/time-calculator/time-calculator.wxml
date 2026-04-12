@@ -1,0 +1,107 @@
+<!-- time-calculator.wxml -->
+<scroll-view class="scrollarea" scroll-y type="list">
+  <view class="container">
+    <!-- 标题 -->
+    <view class="title-container">
+      <view class="title">时间计算器</view>
+    </view>
+    
+    <!-- 当前UTC时间 -->
+    <view class="current-utc">
+      <view class="current-utc-label">当前世界协调时 (UTC)（重新 进入页面刷新）:</view>
+      <view class="current-utc-time">{{currentUTC}}</view>
+    </view>
+    
+    <!-- UTC转当地时间 -->
+    <view class="calculator-section">
+      <view class="section-title">UTC → 当地时间</view>
+      
+      <view class="input-group">
+        <view class="input-label">UTC时间</view>
+        <view class="time-inputs">
+          <picker mode="date" value="{{utcDate}}" start="2000-01-01" end="2100-12-31" bindchange="onUTCDateChange">
+            <view class="picker">{{utcDate}}</view>
+          </picker>
+          <picker mode="time" value="{{utcTime}}" bindchange="onUTCTimeChange">
+            <view class="picker">{{utcTime}}</view>
+          </picker>
+        </view>
+      </view>
+      
+      <view class="input-group">
+        <view class="input-label">时区偏移 (UTC)</view>
+        <picker bindchange="onUTCOffsetChange" range="{{timezones}}" range-key="label" value="{{utcOffsetIndex}}">
+          <view class="picker">{{timezones[utcOffsetIndex].label}}</view>
+        </picker>
+      </view>
+      
+      <button class="calculate-button" bindtap="calculateLocalTime">计算当地时间</button>
+      
+      <view class="result-section">
+        <view class="result-item">
+          <view class="result-label">当地时间:</view>
+          <view class="result-value">{{localTimeResult || '-'}}</view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 当地时间转UTC -->
+    <view class="calculator-section">
+      <view class="section-title">当地时间 → UTC</view>
+      
+      <view class="input-group">
+        <view class="input-label">当地时间</view>
+        <view class="time-inputs">
+          <picker mode="date" value="{{localDate}}" start="2000-01-01" end="2100-12-31" bindchange="onLocalDateChange">
+            <view class="picker">{{localDate}}</view>
+          </picker>
+          <picker mode="time" value="{{localTime}}" bindchange="onLocalTimeChange">
+            <view class="picker">{{localTime}}</view>
+          </picker>
+        </view>
+      </view>
+      
+      <view class="input-group">
+        <view class="input-label">时区偏移 (UTC)</view>
+        <picker bindchange="onLocalOffsetChange" range="{{timezones}}" range-key="label" value="{{localOffsetIndex}}">
+          <view class="picker">{{timezones[localOffsetIndex].label}}</view>
+        </picker>
+      </view>
+      
+      <button class="calculate-button" bindtap="calculateUTCTime">计算UTC时间</button>
+      
+      <view class="result-section">
+        <view class="result-item">
+          <view class="result-label">UTC时间:</view>
+          <view class="result-value">{{utcTimeResult || '-'}}</view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 经度计算UTC偏移 -->
+    <view class="calculator-section">
+      <view class="section-title">经度 → UTC偏移</view>
+      
+      <view class="input-group">
+        <view class="input-label">经度 (度数，东为正，西为负)</view>
+        <input type="number" class="input-field longitude-input" bindinput="onLongitudeInput" value="{{longitude}}" />
+      </view>
+      
+      <button class="calculate-button" bindtap="calculateUTCOffsetFromLongitude">计算UTC偏移</button>
+      
+      <view class="result-section">
+        <view class="result-item">
+          <view class="result-label">UTC偏移:</view>
+          <view class="result-value">{{utcOffsetFromLongitude || '-'}}</view>
+        </view>
+        <view class="result-item">
+          <view class="result-label">时区:</view>
+          <view class="result-value">{{timezoneFromLongitude || '-'}}</view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 底部间距 -->
+    <view class="bottom-spacing"></view>
+  </view>
+</scroll-view>

@@ -1,0 +1,175 @@
+<!-- PEPEC.wxml - ICAO英语音频练习页面 -->
+<view class="page">
+
+  <!-- 顶部标题 -->
+  <view class="header">
+    <text class="header-title">ICAO英语音频练习</text>
+  </view>
+
+  <!-- 主内容区 -->
+  <view class="main-area">
+
+    <!-- 导入提示 -->
+    <view class="import-tip">
+      <text class="tip-text">确保手机关闭静音模式，报错需要清理缓存</text>
+    </view>
+
+    <!-- 导入按钮 -->
+    <view class="import-section">
+      <view class="import-buttons">
+        <button class="import-btn primary" bindtap="onChooseFromChat">📁 导入MP3文件</button>
+        <button class="import-btn primary" bindtap="onChooseZipFile">📦 导入ZIP文件</button>
+        <button class="import-btn primary" bindtap="onImportOnline">🌐 使用线上资源</button>
+      </view>
+    </view>
+
+    <!-- 练习模式选择 -->
+    <view class="mode-section">
+      <view class="mode-card {{playMode === 'sequence' ? 'active' : ''}}" bindtap="onToggleMode">
+        <text class="mode-icon">🔁</text>
+        <text class="mode-text">{{playModeText}}</text>
+      </view>
+      <view class="mode-card {{autoPlayNext ? 'active' : ''}}" bindtap="onToggleAutoPlay">
+        <text class="mode-icon">🔂</text>
+        <text class="mode-text">自动连播：{{autoPlayNext ? '开' : '关'}}</text>
+      </view>
+    </view>
+
+    <!-- 当前播放文件 -->
+    <view class="current-file-section">
+      <text class="section-label">当前文件</text>
+      <view class="current-file-name">{{currentFileName}}</view>
+    </view>
+
+    <!-- 进度条区域 -->
+    <view class="progress-section">
+      <text class="time-text">{{currentTimeText}}</text>
+      <slider
+        class="progress-slider"
+        min="0" max="100"
+        value="{{progress}}"
+        activeColor="#1890ff"
+        backgroundColor="#e8e8e8"
+        block-size="14"
+        bindchange="onProgressChange"
+      />
+      <text class="time-text">{{durationText}}</text>
+    </view>
+
+    <!-- 播放控制按钮 -->
+    <view class="control-section">
+      <view class="control-btn favorite-btn" bindtap="onToggleFavorite">
+        <text class="control-icon">{{isCurrentFavorite ? '⭐' : '☆'}}</text>
+        <text class="control-label">{{isCurrentFavorite ? '已收藏' : '收藏'}}</text>
+      </view>
+      <view class="control-btn prev-btn" bindtap="onPrev">
+        <text class="control-icon">⏮</text>
+        <text class="control-label">上一个</text>
+      </view>
+      <view class="control-btn play-btn {{isPlaying ? 'playing' : ''}}" bindtap="onPlayPause">
+        <text class="control-icon">{{isPlaying ? '⏸' : '▶️'}}</text>
+        <text class="control-label">{{isPlaying ? '暂停' : '播放'}}</text>
+      </view>
+      <view class="control-btn next-btn" bindtap="onNext">
+        <text class="control-icon">⏭</text>
+        <text class="control-label">下一个</text>
+      </view>
+      <view class="control-btn speed-btn" bindtap="onToggleSpeedPicker">
+        <text class="control-icon">⏩</text>
+        <text class="control-label">{{playbackRate}}x</text>
+      </view>
+    </view>
+
+    <!-- 倍速选择器 -->
+    <view class="speed-picker-overlay {{showSpeedPicker ? 'show' : ''}}" bindtap="onCloseSpeedPicker">
+      <view class="speed-picker-content" catchtap="stopPropagation">
+        <view class="speed-picker-header">
+          <text class="speed-picker-title">选择播放速度</text>
+        </view>
+        <picker-view 
+          class="speed-picker-view"
+          value="{{[speedIndex]}}"
+          bindchange="onSpeedPickerChange"
+        >
+          <picker-view-column>
+            <view wx:for="{{speedOptions}}" wx:key="index" class="picker-item">
+              {{item}}x
+            </view>
+          </picker-view-column>
+        </picker-view>
+        <view class="speed-picker-footer">
+          <button class="speed-picker-close-btn" bindtap="onCloseSpeedPicker">关闭</button>
+        </view>
+      </view>
+    </view>
+
+    <!-- 文件列表 -->
+    <view class="file-list-section">
+      <view class="file-list-header">
+        <text class="section-label">文件列表 ({{audioList.length}})</text>
+        <text class="clear-btn" bindtap="onClearAll" wx:if="{{audioList.length > 0}}">清空</text>
+      </view>
+      <scroll-view class="file-list-scroll" scroll-y>
+        <view
+          wx:for="{{audioList}}"
+          wx:key="index"
+          class="file-item {{currentIndex === index ? 'active' : ''}} {{item.isFavorite ? 'favorite' : ''}}"
+          data-index="{{index}}"
+          bindtap="onFileItemTap"
+        >
+          <text class="file-index">{{index + 1}}.</text>
+          <text class="file-name">{{item.name}}</text>
+          <text class="file-favorite-icon" wx:if="{{item.isFavorite}}">⭐</text>
+          <text class="file-play-icon" wx:if="{{currentIndex === index && isPlaying}}">▶</text>
+        </view>
+        <view wx:if="{{audioList.length === 0}}" class="empty-hint">
+          <text>暂无文件，请点击上方按钮导入音频</text>
+        </view>
+      </scroll-view>
+    </view>
+
+  </view>
+
+  <!-- 学号输入弹窗（已注释）
+  <view class="modal-overlay {{showInputModal ? 'show' : ''}}" bindtap="onModalTap">
+    <view class="modal-content">
+      <view class="modal-header">
+        <text class="modal-title">输入学号验证</text>
+        <text class="modal-close" bindtap="onCloseModal">✕</text>
+      </view>
+      <view class="modal-body">
+        <input 
+          class="modal-input" 
+          type="text" 
+          placeholder="请输入学号" 
+          maxlength="20"
+          value="{{studentIdInput}}"
+          bindinput="onStudentIdInput"
+        />
+      </view>
+      <view class="modal-footer">
+        <button class="modal-btn cancel" bindtap="onCloseModal">取消</button>
+        <button class="modal-btn confirm" bindtap="onConfirmImport">确定</button>
+      </view>
+    </view>
+  </view>
+  -->
+
+  <!-- 教材配套资源提示弹窗 -->
+  <view class="modal-overlay {{showInputModal ? 'show' : ''}}" bindtap="onModalTap">
+    <view class="modal-content">
+      <view class="modal-header">
+        <text class="modal-title">提示</text>
+        <text class="modal-close" bindtap="onCloseModal">✕</text>
+      </view>
+      <view class="modal-body">
+        <text class="modal-text">此内容为教材配套资源，请确保购买过中国民航出版社的《PEPEC中国民航飞行员英语考试900句》</text>
+      </view>
+      <view class="modal-footer">
+        <button class="modal-btn cancel" bindtap="onCloseModal">取消</button>
+        <button class="modal-btn confirm" bindtap="onConfirmImport">确认</button>
+      </view>
+    </view>
+  </view>
+
+</view>

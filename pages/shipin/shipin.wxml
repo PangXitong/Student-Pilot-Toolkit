@@ -1,0 +1,29 @@
+<scroll-view class="scrollarea" scroll-y type="list">
+  <view class="container">
+    <!-- 标题 -->
+    <view class="title">视频</view>
+    <!-- 副标题 -->
+    <view class="subtitle">
+      <text>欢迎关注我的视频账号！</text>
+      <text>点击二维码进入我的视频号主页</text>
+    </view>
+    
+    <!-- 二维码位置 -->
+    <view class="qrcode-container">
+      <button class="qrcode-button" open-type="openChannels" channels-username="sphy6OHkFHfYeqj">
+        <image class="qrcode-image" src="../images/ChannelsCodeView.jpg"></image>
+      </button>
+    </view>
+    
+    <!-- 保存图片按钮 -->
+    <view class="save-button" bindtap="saveImage">
+      <text class="save-button-text">保存图片</text>
+    </view>
+    
+    <!-- 抖音账号信息 -->
+    <view class="douyin-account">
+      <image class="douyin-icon" src="../images/douyinicon.jpg"></image>
+      <text class="account-text">抖音：@六里路（OldsaiA350）</text>
+    </view>
+  </view>
+</scroll-view>

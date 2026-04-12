@@ -1,0 +1,161 @@
+/** e6b-calculator.wxss **/
+/* 全局样式 */
+page {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+}
+
+.scrollarea {
+  overflow-y: auto;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40rpx 20rpx;
+  box-sizing: border-box;
+}
+
+/* 标题容器 */
+.title-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin-bottom: 20rpx;
+}
+
+/* 标题样式 */
+.title {
+  font-size: 60rpx;
+  font-weight: bold;
+  color: #1890ff;
+  text-align: center;
+}
+
+/* 副标题样式 */
+.subtitle {
+  font-weight: 900;
+  font-size: 24rpx;
+  color: #333333;
+  text-align: center;
+  margin-bottom: 40rpx;
+  line-height: 1.5;
+}
+
+.subtitle text {
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.subtitle text:last-child {
+  margin-bottom: 0;
+}
+
+/* 问题容器 */
+.question-container {
+  width: 100%;
+  background-color: #f5f5f5;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  box-sizing: border-box;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+  margin-bottom: 30rpx;
+}
+
+/*  instructions */
+.instructions {
+  font-size: 28rpx;
+  color: #666666;
+  margin-bottom: 20rpx;
+  text-align: center;
+  font-weight: bold;
+}
+
+/* 问题 */
+.question {
+  font-size: 32rpx;
+  color: #333333;
+  margin-bottom: 20rpx;
+  line-height: 1.5;
+  font-weight: bold;
+}
+
+/* 答案 */
+.answer {
+  font-size: 36rpx;
+  color: #1890ff;
+  margin-bottom: 30rpx;
+  line-height: 1.5;
+  font-weight: bold;
+}
+
+/* 帮助部分 */
+.help-section {
+  background-color: #ffffff;
+  border-radius: 10rpx;
+  padding: 20rpx;
+  box-sizing: border-box;
+}
+
+/* 帮助标题 */
+.help-title {
+  font-size: 28rpx;
+  color: #333333;
+  margin-bottom: 15rpx;
+  font-weight: bold;
+}
+
+/* 帮助步骤 */
+.help-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 10rpx;
+}
+
+/* 帮助步骤项 */
+.help-step {
+  font-size: 24rpx;
+  color: #666666;
+  line-height: 1.5;
+}
+
+/* 按钮容器 */
+.button-container {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 30rpx;
+  gap: 20rpx;
+}
+
+/* 刷新按钮 */
+.refresh-button {
+  flex: 1;
+  background-color: #1890ff;
+  color: white;
+  border: none;
+  border-radius: 10rpx;
+  padding: 20rpx;
+  font-size: 28rpx;
+  font-weight: bold;
+}
+
+/* 展示答案按钮 */
+.show-answer-button {
+  flex: 1;
+  background-color: #52c41a;
+  color: white;
+  border: none;
+  border-radius: 10rpx;
+  padding: 20rpx;
+  font-size: 28rpx;
+  font-weight: bold;
+}
+
+/* 底部间距 */
+.bottom-spacing {
+  height: 50rpx;
+}

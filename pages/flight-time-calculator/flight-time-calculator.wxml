@@ -1,0 +1,199 @@
+<!-- flight-time-calculator.wxml -->
+<scroll-view class="scrollarea" scroll-y type="list">
+  <view class="container">
+    <!-- 标题 -->
+    <view class="title-container">
+      <view class="title">学员训练时间计算器</view>
+    </view>
+    
+    <!-- 跳转按钮
+    <view class="switch-container">
+      <button class="switch-button" bindtap="goToTeacher">学员版本</button>
+    </view> -->
+    
+    <!-- 输入部分 -->
+    <view class="input-section">
+      <view class="section-title">输入飞行时间</view>
+      
+      <!-- 飞行开始时间 -->
+      <view class="input-group">
+        <view class="input-label">开始时间</view>
+        <view class="input-controls">
+          <picker mode="date" value="{{startTime.date}}" start="2000-01-01" end="2100-12-31" bindchange="onStartDateChange">
+            <view class="picker">{{startTime.date}}</view>
+          </picker>
+          <picker mode="time" value="{{startTime.time}}" bindchange="onStartTimeChange">
+            <view class="picker">{{startTime.time}}</view>
+          </picker>
+        </view>
+      </view>
+      
+      <!-- 飞行结束时间 -->
+      <view class="input-group">
+        <view class="input-label">结束时间</view>
+        <view class="input-controls">
+          <picker mode="date" value="{{endTime.date}}" start="2000-01-01" end="2100-12-31" bindchange="onEndDateChange">
+            <view class="picker">{{endTime.date}}</view>
+          </picker>
+          <picker mode="time" value="{{endTime.time}}" bindchange="onEndTimeChange">
+            <view class="picker">{{endTime.time}}</view>
+          </picker>
+        </view>
+      </view>
+      
+      <!-- 飞行类型选择 -->
+      <view class="input-group">
+        <view class="input-label">飞行类型</view>
+        <picker mode="selector" range="{{flightTypes}}" range-key="label" value="{{flightTypeIndex}}" bindchange="onFlightTypeChange">
+          <view class="picker">{{flightTypes[flightTypeIndex].label}}</view>
+        </picker>
+      </view>
+      
+      <button class="add-button" bindtap="addFlightRecord">添加飞行记录</button>
+    </view>
+    
+    <!-- 统计部分 -->
+    <view class="stats-section">
+      <view class="section-title">统计信息</view>
+      
+      <view class="stat-item">
+        <view class="stat-label">最近24小时已飞:</view>
+        <view class="stat-value {{color24h === 'warning' ? 'text-warning' : ''}} {{color24h === 'danger' ? 'text-danger' : ''}}">{{totalHours24}}</view>
+      </view>
+      
+      <view class="stat-item">
+        <view class="stat-label">最近七个日历日已飞:</view>
+        <view class="stat-value {{color168h === 'warning' ? 'text-warning' : ''}} {{color168h === 'danger' ? 'text-danger' : ''}}">{{totalHours168}}</view>
+      </view>
+      
+      <view class="stat-item">
+        <view class="stat-label">下一次可飞时间:</view>
+        <view class="stat-value">{{nextAvailableTime || '随时可飞！'}}</view>
+      </view>
+      
+      <view class="stat-item">
+        <view class="stat-label">{{nextAvailableTime === '随时可飞！' ? '还可以飞多久:' : '到那时候可以飞多久:'}}</view>
+        <view class="stat-value">{{nextAvailableTime === '随时可飞！' ? remainingTime : nextAvailableRemainingTime}}</view>
+      </view>
+    </view>
+    
+    <!-- 飞行计划部分 -->
+    <view class="stats-section">
+      <view class="section-title">飞行计划</view>
+      
+      <view class="stat-item">
+        <view class="stat-label">计划下次飞行开始的时间:</view>
+        <view class="stat-input-group">
+          <view class="input-row">
+            <picker mode="date" value="{{nextPlanDate}}" start="2000-01-01" end="2100-12-31" bindchange="onNextPlanDateChange">
+              <view class="picker">{{nextPlanDate}}</view>
+            </picker>
+            <picker mode="time" value="{{nextPlanTime}}" bindchange="onNextPlanTimeChange">
+              <view class="picker">{{nextPlanTime}}</view>
+            </picker>
+          </view>
+          <view class="input-row">
+            <picker mode="selector" range="{{flightTypes}}" range-key="label" value="{{nextPlanFlightTypeIndex}}" bindchange="onNextPlanFlightTypeChange">
+              <view class="picker">{{flightTypes[nextPlanFlightTypeIndex].label}}</view>
+            </picker>
+            <button class="calc-btn" bindtap="calculateRemainingTime">计算</button>
+          </view>
+        </view>
+      </view>
+      
+      <view class="stat-item">
+        <view class="stat-label">计划还能飞:</view>
+        <view class="stat-value">{{plannedRemainingTime === 0 ? '请在上一行输入信息' : plannedRemainingTime}}</view>
+      </view>
+      
+      <view class="divider"></view>
+      
+      <view class="stat-item">
+        <view class="stat-label">下次飞多久:</view>
+        <view class="stat-input-group">
+          <view class="input-row">
+            <picker mode="selector" range="{{hourOptions}}" value="{{nextFlightHourIndex}}" bindchange="onNextFlightHourChange">
+              <view class="picker">{{nextFlightHourIndex === 0 && nextFlightMinuteIndex === 0 ? '小时' : hourOptions[nextFlightHourIndex]}}</view>
+            </picker>
+            <text class="colon">:</text>
+            <picker mode="selector" range="{{minuteOptions}}" value="{{nextFlightMinuteIndex}}" bindchange="onNextFlightMinuteChange">
+              <view class="picker">{{nextFlightHourIndex === 0 && nextFlightMinuteIndex === 0 ? '分钟' : minuteOptions[nextFlightMinuteIndex]}}</view>
+            </picker>
+            <picker mode="selector" range="{{flightTypes}}" range-key="label" value="{{nextFlightFlightTypeIndex}}" bindchange="onNextFlightFlightTypeChange">
+              <view class="picker">{{flightTypes[nextFlightFlightTypeIndex].label}}</view>
+            </picker>
+            <button class="calc-btn" bindtap="calculateNextAvailableTime">计算</button>
+          </view>
+        </view>
+      </view>
+      
+      <view class="stat-item">
+        <view class="stat-label">什么时间可开始飞行:</view>
+        <view class="stat-value">{{nextAvailableTimeText}}</view>
+      </view>
+    </view>
+    
+    <!-- 历史记录部分 -->
+    <view class="history-section">
+      <view class="section-title">
+        <view class="history-title">历史记录</view>
+        <button class="clear-all-button" bindtap="clearAllHistory">全部清除</button>
+      </view>
+      
+      <view class="history-controls">
+        <button class="import-btn" bindtap="importHistory">导入</button>
+        <button class="export-btn" bindtap="exportHistory">导出</button>
+      </view>
+      
+      <view class="history-list">
+        <block wx:if="{{history.length > 0}}">
+          <block wx:for="{{history}}" wx:key="id">
+            <view class="history-item">
+              <view class="history-info">
+                <view class="history-time">{{item.startTime}} - {{item.endTime}}</view>
+                <view class="history-type">{{item.flightType}}</view>
+              </view>
+              <view class="history-duration">
+                <view class="duration-value">{{item.durationText}}</view>
+                <view class="duration-label">时长</view>
+              </view>
+              <view class="delete-button" bindtap="deleteHistoryItem" data-index="{{index}}">删除</view>
+            </view>
+          </block>
+        </block>
+        <block wx:else>
+          <view class="empty-history">
+            <view class="empty-icon">✈️</view>
+            <view class="empty-text">暂无历史记录</view>
+            <view class="empty-subtext">请在上方输入飞行时间并添加记录</view>
+          </view>
+        </block>
+      </view>
+      
+      <view class="history-total">
+        <view class="history-total-label">总飞行时间: {{totalHours}}</view>
+      </view>
+    </view>
+    
+    <!-- 说明部分 -->
+    <view class="info-section">
+      <view class="info-title">注意事项</view>
+      <view class="info-content">
+      <!-- 
+        <text>　　计算方法：连续24小时飞行时间不超4小时(转场不超过5小时)，连续7天(168小时)不超过20小时。</text>
+        <text>{{'\n'}}</text>
+      -->
+        <text>　　计算方法：连续24小时飞行时间不超4小时(转场不超过5小时)，连续7个日历日天不超过20小时。</text>
+        <text>{{'\n'}}</text>
+        <text>　　当最近24小时超过3小时时，统计信息中数字变成橙色，刚好达到或超过4小时时变成红色；最近168小时飞行时间超过19小时时颜色变成橙色，刚好达到或超过20小时时变成红色。</text>
+        <text>{{'\n'}}</text>
+        <text>　　本工具仅在本地运行和存储，清除缓存历史记录将消失。</text>
+        <text>{{'\n'}}</text>
+        <text>　　</text><text class="important-warning">重要提醒：</text><text>本工具仅作为辅助计算参考，最终训练安排请以民航法规和航校要求为准！</text>
+      </view>
+    </view>
+    
+    <!-- 底部间距 -->
+    <view class="bottom-spacing"></view>
+  </view>
+</scroll-view>

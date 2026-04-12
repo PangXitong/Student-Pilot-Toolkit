@@ -1,0 +1,200 @@
+<scroll-view class="scrollarea" scroll-y type="list">
+  <view class="container">
+    <!-- 标题 -->
+    <view class="title">单位换算器</view>
+    
+    <!-- 当前物理量显示和切换按钮 -->
+    <view class="current-category-section">
+      <view class="current-category-name">当前物理量：{{currentCategoryName}}</view>
+      <button class="switch-category-btn" bindtap="showCategoryModal">切换物理量</button>
+    </view>
+    
+    <!-- 单位输入区域 -->
+    <view class="units-container">
+      <!-- 速度单位 -->
+      <view wx:if="{{currentCategory === 'speed'}}">
+        <view class="unit-row" wx:for="{{speedUnits}}" wx:key="unit">
+          <input class="unit-input" type="number" value="{{item.value}}" bindinput="onInput" data-category="speed" data-unit="{{item.unit}}" placeholder="0" />
+          <view class="unit-info">
+            <view class="unit-name">{{item.name}}</view>
+            <view class="unit-symbol">{{item.symbol}}</view>
+          </view>
+        </view>
+        <view class="ad-wrapper">
+          <ad-custom unit-id="adunit-bd819a878ccd8387" bindload="adLoad" binderror="adError" bindclose="adClose"></ad-custom>
+        </view>
+      </view>
+      
+      <!-- 角度单位 -->
+      <view wx:if="{{currentCategory === 'angle'}}">
+        <view class="unit-row" wx:for="{{angleUnits}}" wx:key="unit">
+          <input class="unit-input" type="number" value="{{item.value}}" bindinput="onInput" data-category="angle" data-unit="{{item.unit}}" placeholder="0" />
+          <view class="unit-info">
+            <view class="unit-name">{{item.name}}</view>
+            <view class="unit-symbol">{{item.symbol}}</view>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 长度单位 -->
+      <view wx:if="{{currentCategory === 'length'}}">
+        <view class="unit-row" wx:for="{{lengthUnits}}" wx:key="unit">
+          <input class="unit-input" type="number" value="{{item.value}}" bindinput="onInput" data-category="length" data-unit="{{item.unit}}" placeholder="0" />
+          <view class="unit-info">
+            <view class="unit-name">{{item.name}}</view>
+            <view class="unit-symbol">{{item.symbol}}</view>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 面积单位 -->
+      <view wx:if="{{currentCategory === 'area'}}">
+        <view class="unit-row" wx:for="{{areaUnits}}" wx:key="unit">
+          <input class="unit-input" type="number" value="{{item.value}}" bindinput="onInput" data-category="area" data-unit="{{item.unit}}" placeholder="0" />
+          <view class="unit-info">
+            <view class="unit-name">{{item.name}}</view>
+            <view class="unit-symbol">{{item.symbol}}</view>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 数据存储单位 -->
+      <view wx:if="{{currentCategory === 'data'}}">
+        <view class="unit-row" wx:for="{{dataUnits}}" wx:key="unit">
+          <input class="unit-input" type="number" value="{{item.value}}" bindinput="onInput" data-category="data" data-unit="{{item.unit}}" placeholder="0" />
+          <view class="unit-info">
+            <view class="unit-name">{{item.name}}</view>
+            <view class="unit-symbol">{{item.symbol}}</view>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 能量单位 -->
+      <view wx:if="{{currentCategory === 'energy'}}">
+        <view class="unit-row" wx:for="{{energyUnits}}" wx:key="unit">
+          <input class="unit-input" type="number" value="{{item.value}}" bindinput="onInput" data-category="energy" data-unit="{{item.unit}}" placeholder="0" />
+          <view class="unit-info">
+            <view class="unit-name">{{item.name}}</view>
+            <view class="unit-symbol">{{item.symbol}}</view>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 力单位 -->
+      <view wx:if="{{currentCategory === 'force'}}">
+        <view class="unit-row" wx:for="{{forceUnits}}" wx:key="unit">
+          <input class="unit-input" type="number" value="{{item.value}}" bindinput="onInput" data-category="force" data-unit="{{item.unit}}" placeholder="0" />
+          <view class="unit-info">
+            <view class="unit-name">{{item.name}}</view>
+            <view class="unit-symbol">{{item.symbol}}</view>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 燃料效率单位 -->
+      <view wx:if="{{currentCategory === 'fuel'}}">
+        <view class="unit-row" wx:for="{{fuelUnits}}" wx:key="unit">
+          <input class="unit-input" type="number" value="{{item.value}}" bindinput="onInput" data-category="fuel" data-unit="{{item.unit}}" placeholder="0" />
+          <view class="unit-info">
+            <view class="unit-name">{{item.name}}</view>
+            <view class="unit-symbol">{{item.symbol}}</view>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 功率单位 -->
+      <view wx:if="{{currentCategory === 'power'}}">
+        <view class="unit-row" wx:for="{{powerUnits}}" wx:key="unit">
+          <input class="unit-input" type="number" value="{{item.value}}" bindinput="onInput" data-category="power" data-unit="{{item.unit}}" placeholder="0" />
+          <view class="unit-info">
+            <view class="unit-name">{{item.name}}</view>
+            <view class="unit-symbol">{{item.symbol}}</view>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 压力单位 -->
+      <view wx:if="{{currentCategory === 'pressure'}}">
+        <view class="unit-row" wx:for="{{pressureUnits}}" wx:key="unit">
+          <input class="unit-input" type="number" value="{{item.value}}" bindinput="onInput" data-category="pressure" data-unit="{{item.unit}}" placeholder="0" />
+          <view class="unit-info">
+            <view class="unit-name">{{item.name}}</view>
+            <view class="unit-symbol">{{item.symbol}}</view>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 温度单位 -->
+      <view wx:if="{{currentCategory === 'temperature'}}">
+        <view class="unit-row" wx:for="{{temperatureUnits}}" wx:key="unit">
+          <input class="unit-input" type="number" value="{{item.value}}" bindinput="onInput" data-category="temperature" data-unit="{{item.unit}}" placeholder="0" />
+          <view class="unit-info">
+            <view class="unit-name">{{item.name}}</view>
+            <view class="unit-symbol">{{item.symbol}}</view>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 时间单位 -->
+      <view wx:if="{{currentCategory === 'time'}}">
+        <view class="unit-row" wx:for="{{timeUnits}}" wx:key="unit">
+          <input class="unit-input" type="number" value="{{item.value}}" bindinput="onInput" data-category="time" data-unit="{{item.unit}}" placeholder="0" />
+          <view class="unit-info">
+            <view class="unit-name">{{item.name}}</view>
+            <view class="unit-symbol">{{item.symbol}}</view>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 体积单位 -->
+      <view wx:if="{{currentCategory === 'volume'}}">
+        <view class="unit-row" wx:for="{{volumeUnits}}" wx:key="unit">
+          <input class="unit-input" type="number" value="{{item.value}}" bindinput="onInput" data-category="volume" data-unit="{{item.unit}}" placeholder="0" />
+          <view class="unit-info">
+            <view class="unit-name">{{item.name}}</view>
+            <view class="unit-symbol">{{item.symbol}}</view>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 重量/质量单位 -->
+      <view wx:if="{{currentCategory === 'weight'}}">
+        <view class="unit-row" wx:for="{{weightUnits}}" wx:key="unit">
+          <input class="unit-input" type="number" value="{{item.value}}" bindinput="onInput" data-category="weight" data-unit="{{item.unit}}" placeholder="0" />
+          <view class="unit-info">
+            <view class="unit-name">{{item.name}}</view>
+            <view class="unit-symbol">{{item.symbol}}</view>
+          </view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 物理量切换弹窗 -->
+    <view class="modal-overlay {{showCategoryModal ? 'show' : ''}}" bindtap="onModalTap">
+      <view class="modal-content">
+        <view class="modal-header">
+          <text class="modal-title">选择物理量</text>
+          <text class="modal-close" bindtap="onCloseModal">✕</text>
+        </view>
+        <view class="modal-body">
+          <view class="category-grid">
+            <button class="category-item {{currentCategory === 'angle' ? 'active' : ''}}" bindtap="switchCategory" data-category="angle">角度</button>
+            <button class="category-item {{currentCategory === 'length' ? 'active' : ''}}" bindtap="switchCategory" data-category="length">长度</button>
+            <button class="category-item {{currentCategory === 'area' ? 'active' : ''}}" bindtap="switchCategory" data-category="area">面积</button>
+            <button class="category-item {{currentCategory === 'data' ? 'active' : ''}}" bindtap="switchCategory" data-category="data">数据存储</button>
+            <button class="category-item {{currentCategory === 'energy' ? 'active' : ''}}" bindtap="switchCategory" data-category="energy">能量</button>
+            <button class="category-item {{currentCategory === 'force' ? 'active' : ''}}" bindtap="switchCategory" data-category="force">力</button>
+            <button class="category-item {{currentCategory === 'fuel' ? 'active' : ''}}" bindtap="switchCategory" data-category="fuel">燃料效率</button>
+            <button class="category-item {{currentCategory === 'power' ? 'active' : ''}}" bindtap="switchCategory" data-category="power">功率</button>
+            <button class="category-item {{currentCategory === 'pressure' ? 'active' : ''}}" bindtap="switchCategory" data-category="pressure">压力</button>
+            <button class="category-item {{currentCategory === 'speed' ? 'active' : ''}}" bindtap="switchCategory" data-category="speed">速度</button>
+            <button class="category-item {{currentCategory === 'temperature' ? 'active' : ''}}" bindtap="switchCategory" data-category="temperature">温度</button>
+            <button class="category-item {{currentCategory === 'time' ? 'active' : ''}}" bindtap="switchCategory" data-category="time">时间</button>
+            <button class="category-item {{currentCategory === 'volume' ? 'active' : ''}}" bindtap="switchCategory" data-category="volume">体积</button>
+            <button class="category-item {{currentCategory === 'weight' ? 'active' : ''}}" bindtap="switchCategory" data-category="weight">重量/质量</button>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</scroll-view>

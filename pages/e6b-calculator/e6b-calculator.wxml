@@ -1,0 +1,37 @@
+<!-- e6b-calculator.wxml -->
+<scroll-view class="scrollarea" scroll-y type="list">
+  <view class="container">
+    <!-- 标题 -->
+    <view class="title-container">
+      <view class="title">领航计算尺练习题</view>
+    </view>
+    <view class="subtitle">
+      <text>这是一个领航计算尺练习题生成器。</text>
+      <text>目前仅提供航向、地速的计算练习，其他题目敬请期待。</text>
+    </view>
+    
+    <!-- 问题区域 -->
+    <view class="question-container">
+      <view class="instructions">
+        <text>点击按钮生成新题目或查看答案</text>
+      </view>
+      <view class="question" id="question">{{question}}</view>
+      <view class="answer" id="answer" wx:if="{{showAnswer}}">{{answer}}</view>
+      <view class="help-section" id="help" wx:if="{{showAnswer}}">
+        <view class="help-title">解答步骤</view>
+        <view class="help-steps" id="help-steps">
+          <view wx:for="{{helpSteps}}" wx:key="index" class="help-step">
+            <text>{{index + 1}}. {{item}}</text>
+          </view>
+        </view>
+      </view>
+      <view class="button-container">
+        <button class="refresh-button" bindtap="generateQuestion">刷新题目</button>
+        <button class="show-answer-button" bindtap="showAnswer">展示答案</button>
+      </view>
+    </view>
+    
+    <!-- 底部间距 -->
+    <view class="bottom-spacing"></view>
+  </view>
+</scroll-view>

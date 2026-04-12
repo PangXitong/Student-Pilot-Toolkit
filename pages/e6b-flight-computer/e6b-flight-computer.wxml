@@ -1,0 +1,352 @@
+<!-- e6b-flight-computer.wxml -->
+<scroll-view class="scrollarea" scroll-y type="list">
+  <view class="container">
+    <!-- 标题 -->
+    <view class="title-container">
+      <view class="title">E6B领航计算器</view>
+    </view>
+    <view class="subtitle">
+      <text>包含飞行学员计算尺考核内容，练习时可进行检验。</text>
+    </view>
+    
+    <!-- 计算类型选择 -->
+    <view class="calculator-type">
+      <view class="type-title">选择计算类型</view>
+      <view class="type-buttons">
+        <button class="type-button" bindtap="selectCalculatorType" data-type="navigation">应飞航向地速</button>
+        <button class="type-button" bindtap="selectCalculatorType" data-type="fuel">燃油计算</button>
+        <button class="type-button" bindtap="selectCalculatorType" data-type="time">时间距离</button>
+      </view>
+      <view class="type-buttons">
+        <button class="type-button" bindtap="selectCalculatorType" data-type="safeReturn">安全返航点</button>
+        <button class="type-button" bindtap="selectCalculatorType" data-type="altitude">绝对高度修正</button>
+        <button class="type-button" bindtap="selectCalculatorType" data-type="airspeed">空速换算</button>
+      </view>
+      <view class="type-buttons">
+        <button class="type-button" bindtap="selectCalculatorType" data-type="wind">空中风向风速</button>
+        <button class="type-button" bindtap="selectCalculatorType" data-type="gradient">梯度与上升/下降率</button>
+      </view>
+    </view>
+    
+    <!-- 导航计算 -->
+    <view class="calculator-section" wx:if="{{selectedType === 'navigation'}}">
+      <view class="section-title">导航计算</view>
+      <view class="input-group">
+        <view class="input-label">航向 (°):</view>
+        <input class="input-field" type="number" bindinput="onInput" data-field="course" placeholder="输入航向" />
+      </view>
+      <view class="input-group">
+        <view class="input-label">真空速 (节):</view>
+        <input class="input-field" type="number" bindinput="onInput" data-field="tas" placeholder="输入真空速" />
+      </view>
+      <view class="input-group">
+        <view class="input-label">风向 (°):</view>
+        <input class="input-field" type="number" bindinput="onInput" data-field="windDir" placeholder="输入风向" />
+      </view>
+      <view class="input-group">
+        <view class="input-label">风速 (节):</view>
+        <input class="input-field" type="number" bindinput="onInput" data-field="windSpeed" placeholder="输入风速" />
+      </view>
+      <button class="calculate-button" bindtap="calculateNavigation">计算</button>
+      <view class="result-section">
+        <view class="result-item">
+          <view class="result-label">地速 (节):</view>
+          <view class="result-value">{{results.groundSpeed || '-'}}</view>
+        </view>
+        <view class="result-item">
+          <view class="result-label">风修正角 (°):</view>
+          <view class="result-value">{{results.windCorrectionAngle || '-'}}</view>
+        </view>
+        <view class="result-item">
+          <view class="result-label">应飞航向 (°):</view>
+          <view class="result-value">{{results.heading || '-'}}</view>
+        </view>
+      </view>
+      <view class="algorithm-section">
+        <view class="algorithm-title">使用的算法</view>
+        <view class="algorithm-content">
+          <view class="algorithm-step">1. 计算逆风分量：风速 × cos(风向 - 航向)</view>
+          <view class="algorithm-step">2. 计算侧风分量：风速 × sin(风向 - 航向)</view>
+          <view class="algorithm-step">3. 计算有效速度：√(真空速² - 侧风分量²)</view>
+          <view class="algorithm-step">4. 计算地速：有效速度 - 逆风分量</view>
+          <view class="algorithm-step">5. 计算风修正角：arcsin(侧风分量 / 真空速)</view>
+          <view class="algorithm-step">6. 计算应飞航向：航线 + 风修正角</view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 燃油计算 -->
+    <view class="calculator-section" wx:if="{{selectedType === 'fuel'}}">
+      <view class="section-title">燃油计算</view>
+      <view class="input-group">
+        <view class="input-label">燃油流量 (加仑/小时):</view>
+        <input class="input-field" type="number" bindinput="onInput" data-field="fuelFlow" placeholder="输入燃油流量" />
+      </view>
+      <view class="input-group">
+        <view class="input-label">飞行时间 (小时):</view>
+        <input class="input-field" type="number" bindinput="onInput" data-field="flightTime" placeholder="输入飞行时间" />
+      </view>
+      <button class="calculate-button" bindtap="calculateFuel">计算</button>
+      <view class="result-section">
+        <view class="result-item">
+          <view class="result-label">燃油消耗 (加仑):</view>
+          <view class="result-value">{{results.fuelConsumption || '-'}}</view>
+        </view>
+      </view>
+      <view class="algorithm-section">
+        <view class="algorithm-title">使用的算法</view>
+        <view class="algorithm-content">
+          <view class="algorithm-step">燃油消耗 = 燃油流量 × 飞行时间</view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 时间距离计算 -->
+    <view class="calculator-section" wx:if="{{selectedType === 'time'}}">
+      <view class="section-title">时间距离计算</view>
+      <view class="input-group">
+        <view class="input-label">速度 (节):</view>
+        <input class="input-field" type="number" bindinput="onInput" data-field="speed" placeholder="输入速度" />
+      </view>
+      <view class="input-group">
+        <view class="input-label">时间 (小时):</view>
+        <input class="input-field" type="number" bindinput="onInput" data-field="time" placeholder="输入时间" />
+      </view>
+      <button class="calculate-button" bindtap="calculateTimeDistance">计算</button>
+      <view class="result-section">
+        <view class="result-item">
+          <view class="result-label">距离 (海里):</view>
+          <view class="result-value">{{results.distance || '-'}}</view>
+        </view>
+      </view>
+      <view class="algorithm-section">
+        <view class="algorithm-title">使用的算法</view>
+        <view class="algorithm-content">
+          <view class="algorithm-step">距离 = 速度 × 时间</view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 梯度与上升/下降率计算 -->
+    <view class="calculator-section" wx:if="{{selectedType === 'gradient'}}">
+      <view class="section-title">梯度与上升/下降率计算</view>
+      
+      <!-- 必填项 -->
+      <view class="input-section">
+        <view class="section-subtitle">必填项</view>
+        <view class="input-group">
+          <view class="input-label">地速 (节):</view>
+          <input class="input-field" type="number" bindinput="onInput" data-field="groundSpeed" placeholder="输入地速" />
+        </view>
+      </view>
+      
+      <!-- 选填项（二选一） -->
+      <view class="input-section">
+        <view class="section-subtitle">选填项（填写任意一个即可）</view>
+        <view class="input-group">
+          <view class="input-label">梯度 (英尺/海里):</view>
+          <input class="input-field" type="number" bindinput="onInput" data-field="gradient" placeholder="输入梯度" />
+        </view>
+        <view class="input-group">
+          <view class="input-label">上升/下降率 (英尺/分钟):</view>
+          <input class="input-field" type="number" bindinput="onInput" data-field="climbRate" placeholder="输入上升/下降率" />
+        </view>
+      </view>
+      
+      <button class="calculate-button" bindtap="calculateGradient">计算</button>
+      
+      <view class="result-section">
+        <view class="result-item">
+          <view class="result-label">梯度 (%):</view>
+          <view class="result-value">{{results.gradient || '-'}}</view>
+        </view>
+        <view class="result-item">
+          <view class="result-label">上升/下降率 (英尺/分钟):</view>
+          <view class="result-value">{{results.climbRate || '-'}}</view>
+        </view>
+      </view>
+      
+      <view class="algorithm-section">
+        <view class="algorithm-title">使用的算法</view>
+        <view class="algorithm-content">
+          <view class="algorithm-step">计算上升/下降率：梯度 (%) × 5/3 × 地速 (kt)</view>
+          <view class="algorithm-step">计算梯度：(上升/下降率 (ft/min) × 3) / (5 × 地速 (kt))</view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 绝对高度修正 -->
+    <view class="calculator-section" wx:if="{{selectedType === 'altitude'}}">
+      <view class="section-title">绝对高度修正</view>
+      <view class="input-group">
+        <view class="input-label">仪表指示高度 (英尺):</view>
+        <input class="input-field" type="number" bindinput="onInput" data-field="indicatedAltitude" placeholder="输入仪表指示高度" />
+      </view>
+      <view class="input-group">
+        <view class="input-label">标准气压高度 (英尺):</view>
+        <input class="input-field" type="number" bindinput="onInput" data-field="standardPressureAltitude" placeholder="输入标准气压高度" />
+      </view>
+      <view class="input-group">
+        <view class="input-label">外界温度 (°C):</view>
+        <input class="input-field" type="text" bindinput="onInput" data-field="outsideTemp" placeholder="输入外界温度" />
+      </view>
+      <button class="calculate-button" bindtap="calculateTrueAltitude">计算</button>
+      <view class="result-section">
+        <view class="result-item">
+          <view class="result-label">绝对高度 (英尺):</view>
+          <view class="result-value">{{results.trueAltitude || '-'}}</view>
+        </view>
+      </view>
+      <view class="algorithm-section">
+        <view class="algorithm-title">使用的算法</view>
+        <view class="algorithm-content">
+          <view class="algorithm-step">1. 计算ISA温度：15 - (标准气压高度 ÷ 1000) × 2</view>
+          <view class="algorithm-step">2. 计算实际绝对温度（K）：外界温度 + 273.15</view>
+          <view class="algorithm-step">3. 计算ISA绝对温度（K）：ISA温度 + 273.15</view>
+          <view class="algorithm-step">4. 计算绝对高度：仪表指示高度 × (实际绝对温度 / ISA绝对温度)</view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 空速换算 -->
+    <view class="calculator-section" wx:if="{{selectedType === 'airspeed'}}">
+      <view class="section-title">空速换算</view>
+      
+      <!-- 必填项 -->
+      <view class="input-section">
+        <view class="section-subtitle">必填项</view>
+        <view class="input-group">
+          <view class="input-label">高度 (英尺):</view>
+          <input class="input-field" type="number" bindinput="onInput" data-field="altitude" placeholder="输入高度" />
+        </view>
+        <view class="input-group">
+          <view class="input-label">外界温度 (°C):</view>
+          <input class="input-field" type="text" bindinput="onInput" data-field="outsideTemp" placeholder="输入外界温度" />
+        </view>
+      </view>
+      
+      <!-- 选填项（二选一） -->
+      <view class="input-section">
+        <view class="section-subtitle">选填项（填写任意一个即可）</view>
+        <view class="input-group">
+          <view class="input-label">指示空速 (节):</view>
+          <input class="input-field" type="number" bindinput="onInput" data-field="indicatedAirspeed" placeholder="输入指示空速" />
+        </view>
+        <view class="input-group">
+          <view class="input-label">真空速 (节):</view>
+          <input class="input-field" type="number" bindinput="onInput" data-field="trueAirspeed" placeholder="输入真空速" />
+        </view>
+      </view>
+      
+      <button class="calculate-button" bindtap="calculateTrueAirspeed">计算</button>
+      
+      <view class="result-section">
+        <view class="result-item">
+          <view class="result-label">指示空速 (节):</view>
+          <view class="result-value">{{inputs.indicatedAirspeed || '-'}}</view>
+        </view>
+        <view class="result-item">
+          <view class="result-label">真空速 (节):</view>
+          <view class="result-value">{{results.trueAirspeed || '-'}}</view>
+        </view>
+      </view>
+      
+      <view class="algorithm-section">
+        <view class="algorithm-title">使用的算法</view>
+        <view class="algorithm-content">
+          <view class="algorithm-step">1. 计算ISA温度：15 - (高度 ÷ 1000) × 2</view>
+          <view class="algorithm-step">2. 计算高度影响：(高度 / 6000) × 10%</view>
+          <view class="algorithm-step">3. 计算温度影响：((外界温度 - ISA温度) / 5) × 1%</view>
+          <view class="algorithm-step">4. 计算总修正系数：1 + 高度影响 + 温度影响</view>
+          <view class="algorithm-step">5. 计算真空速：指示空速 × 总修正系数</view>
+          <view class="algorithm-step">6. 计算指示空速：真空速 ÷ 总修正系数</view>
+          <view class="algorithm-step">规则：气温每变化5°C，需修正1%表速；高度每变化6000ft，需修正10%表速；</view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 空中风向风速计算 -->
+    <view class="calculator-section" wx:if="{{selectedType === 'wind'}}">
+      <view class="section-title">空中风向风速计算</view>
+      <view class="input-group">
+        <view class="input-label">航向 (°):</view>
+        <input class="input-field" type="number" bindinput="onInput" data-field="heading" placeholder="输入航向" />
+      </view>
+      <view class="input-group">
+        <view class="input-label">地速 (节):</view>
+        <input class="input-field" type="number" bindinput="onInput" data-field="groundSpeedWind" placeholder="输入地速" />
+      </view>
+      <view class="input-group">
+        <view class="input-label">航线 (°):</view>
+        <input class="input-field" type="number" bindinput="onInput" data-field="courseWind" placeholder="输入航线" />
+      </view>
+      <view class="input-group">
+        <view class="input-label">真空速 (节):</view>
+        <input class="input-field" type="number" bindinput="onInput" data-field="tasWind" placeholder="输入真空速" />
+      </view>
+      <button class="calculate-button" bindtap="calculateWind">计算</button>
+      <view class="result-section">
+        <view class="result-item">
+          <view class="result-label">风向 (°):</view>
+          <view class="result-value">{{results.windDirection || '-'}}</view>
+        </view>
+        <view class="result-item">
+          <view class="result-label">风速 (节):</view>
+          <view class="result-value">{{results.windSpeed || '-'}}</view>
+        </view>
+      </view>
+      <view class="algorithm-section">
+        <view class="algorithm-title">使用的算法</view>
+        <view class="algorithm-content">
+          <view class="algorithm-step">1. 计算风修正角：航线 - 航向</view>
+          <view class="algorithm-step">2. 使用余弦定理计算风速：√(真空速² + 地速² - 2 × 真空速 × 地速 × cos(风修正角))</view>
+          <view class="algorithm-step">3. 使用正弦定理计算风向：arcsin((地速 × sin(风修正角)) / 风速)</view>
+          <view class="algorithm-step">4. 计算最终风向：航向 + 风向角</view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 安全返航点计算 -->
+    <view class="calculator-section" wx:if="{{selectedType === 'safeReturn'}}">
+      <view class="section-title">安全返航点计算</view>
+      <view class="input-group">
+        <view class="input-label">去程地速 (节):</view>
+        <input class="input-field" type="number" bindinput="onInput" data-field="outboundSpeed" placeholder="输入去程地速" />
+      </view>
+      <view class="input-group">
+        <view class="input-label">返程地速 (节):</view>
+        <input class="input-field" type="number" bindinput="onInput" data-field="inboundSpeed" placeholder="输入返程地速" />
+      </view>
+      <view class="input-group">
+        <view class="input-label">总燃油 (加仑):</view>
+        <input class="input-field" type="number" bindinput="onInput" data-field="totalFuel" placeholder="输入总燃油" />
+      </view>
+      <view class="input-group">
+        <view class="input-label">燃油流量 (加仑/小时):</view>
+        <input class="input-field" type="number" bindinput="onInput" data-field="fuelFlowRate" placeholder="输入燃油流量" />
+      </view>
+      <button class="calculate-button" bindtap="calculateSafeReturn">计算</button>
+      <view class="result-section">
+        <view class="result-item">
+          <view class="result-label">安全返航点距离 (海里):</view>
+          <view class="result-value">{{results.safeReturnDistance || '-'}}</view>
+        </view>
+        <view class="result-item">
+          <view class="result-label">安全飞行时间 (小时):</view>
+          <view class="result-value">{{results.safeFlightTime || '-'}}</view>
+        </view>
+      </view>
+      <view class="algorithm-section">
+        <view class="algorithm-title">使用的算法</view>
+        <view class="algorithm-content">
+          <view class="algorithm-step">1. 计算可用飞行时间：总燃油 / 燃油流量</view>
+          <view class="algorithm-step">2. 计算安全返航点距离：(可用时间 × 去程地速 × 返程地速) / (去程地速 + 返程地速)</view>
+          <view class="algorithm-step">3. 计算安全飞行时间：安全返航点距离 / 去程地速</view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 底部间距 -->
+    <view class="bottom-spacing"></view>
+  </view>
+</scroll-view>

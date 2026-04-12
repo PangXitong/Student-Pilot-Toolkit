@@ -1,0 +1,88 @@
+<!--speed-calculator.wxml-->
+<scroll-view class="scrollarea" scroll-y type="list">
+  <view class="container">
+
+    <!-- 标题 -->
+    <view class="title-container">
+      <view class="title">随机工具</view>
+    </view>
+
+    <!-- ① 随机数生成器 -->
+    <view class="module-card">
+      <view class="module-title">🎲 随机数生成器</view>
+
+      <view class="input-row">
+        <view class="input-label">开始范围</view>
+        <input class="input-box" type="number" value="{{rng.min}}" bindinput="onRngInput" data-field="min" placeholder="1" />
+      </view>
+      <view class="input-row">
+        <view class="input-label">终止范围</view>
+        <input class="input-box" type="number" value="{{rng.max}}" bindinput="onRngInput" data-field="max" placeholder="100" />
+      </view>
+      <view class="input-row">
+        <view class="input-label">生成数量</view>
+        <input class="input-box" type="number" value="{{rng.count}}" bindinput="onRngInput" data-field="count" placeholder="1" />
+      </view>
+
+      <!-- 是否允许重复（数量 > 1 时显示） -->
+      <view class="toggle-row" wx:if="{{rng.count > 1}}">
+        <view class="input-label">允许重复</view>
+        <switch checked="{{rng.allowRepeat}}" bindchange="onRepeatToggle" color="#1890ff" />
+      </view>
+
+      <button class="action-button" bindtap="generateNumbers">生 成</button>
+
+      <!-- 结果展示 -->
+      <view class="result-box" wx:if="{{rng.results.length > 0}}">
+        <view class="result-label">结果</view>
+        <view class="result-numbers">
+          <text wx:for="{{rng.results}}" wx:key="index" class="result-number">{{item}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- ② 是 / 否 决策器 -->
+    <view class="module-card">
+      <view class="module-title">🪙 是 / 否</view>
+      <view class="module-subtitle">随机帮你做决定</view>
+
+      <button class="action-button" bindtap="generateYesNo">点击决定</button>
+
+      <view class="yesno-result {{yesno.answer === '是' ? 'yes' : yesno.answer === '否' ? 'no' : ''}}" wx:if="{{yesno.answer !== ''}}">
+        {{yesno.answer}}
+      </view>
+    </view>
+
+    <!-- ③ 排列数 & 组合数 -->
+    <view class="module-card">
+      <view class="module-title">📐 A(n,r) &amp; C(n,r)</view>
+
+      <view class="input-row">
+        <view class="input-label">总数 n</view>
+        <input class="input-box" type="number" value="{{pnc.n}}" bindinput="onPncInput" data-field="n" placeholder="10" />
+      </view>
+      <view class="input-row">
+        <view class="input-label">选取 r</view>
+        <input class="input-box" type="number" value="{{pnc.r}}" bindinput="onPncInput" data-field="r" placeholder="3" />
+      </view>
+
+      <button class="action-button" bindtap="calculatePnC">计 算</button>
+
+      <view class="pnc-result-area" wx:if="{{pnc.calculated}}">
+        <view class="pnc-row">
+          <view class="pnc-label">排列数 A(n,r)</view>
+          <view class="pnc-value">{{pnc.permutation}}</view>
+        </view>
+        <view class="pnc-formula">= n! / (n-r)! = {{pnc.permutationFormula}}</view>
+        <view class="pnc-divider"></view>
+        <view class="pnc-row">
+          <view class="pnc-label">组合数 C(n,r)</view>
+          <view class="pnc-value">{{pnc.combination}}</view>
+        </view>
+        <view class="pnc-formula">= n! / (r! × (n-r)!) = {{pnc.combinationFormula}}</view>
+      </view>
+    </view>
+
+    <view class="bottom-spacing"></view>
+  </view>
+</scroll-view>

@@ -1,0 +1,43 @@
+<!--share.wxml-->
+<view class="container">
+  <view class="header">
+    <text class="title">分享此小程序</text>
+    <text class="subtitle">请下载照片或复制链接，分享给朋友打开此小程序</text>
+  </view>
+  <view class="content">
+    <!-- 图片容器 -->
+    <view class="image-container">
+      <!-- 第一张图片 -->
+      <view class="image-item">
+        <view class="image-wrapper">
+          <image class="share-image" src="../images/wxcode.jpg"></image>
+        </view>
+        <view class="image-actions">
+          <button class="download-button" bindtap="downloadImage" data-image="../images/wxcode.jpg">下载图片</button>
+        </view>
+      </view>
+      
+      <!-- 第二张图片 -->
+      <view class="image-item">
+        <view class="image-wrapper image-wrapper-43-49">
+          <image class="share-image" src="../images/2code.jpg"></image>
+        </view>
+        <view class="image-actions">
+          <button class="download-button" bindtap="downloadImage" data-image="../images/2code.jpg">下载图片</button>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 链接部分 
+    <view class="link-section">
+      <text class="link-label">分享链接</text>
+      <view class="link-container">
+        <text class="link-text">example.com</text>
+        <button class="copy-button" bindtap="copyLink">复制链接</button>
+      </view>
+    </view>-->
+    
+    <!-- 返回按钮 -->
+    <button class="back-button" bindtap="goBack">返回首页</button>
+  </view>
+</view>

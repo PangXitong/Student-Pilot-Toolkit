@@ -1,0 +1,37 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/logs/logs",
+    "pages/bmi-calculator/bmi-calculator",
+    "pages/bmr-calculator/bmr-calculator",
+    "pages/heart-rate-calculator/heart-rate-calculator",
+    "pages/shipin/shipin",
+    "pages/unit-converter/unit-converter",
+    "pages/share/share",
+    "pages/e6b-calculator/e6b-calculator",
+    "pages/e6b-flight-computer/e6b-flight-computer",
+    "pages/time-calculator/time-calculator",
+    "pages/webview/webview",
+    "pages/random-number/random-number",
+    "pages/PEPEC/PEPEC",
+    "pages/flight-time-calculator/flight-time-calculator",
+    "pages/flight-time-calculator-teacher/flight-time-calculator-teacher"
+  ],
+  "window": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "六里路",
+    "navigationBarBackgroundColor": "#ffffff"
+  },
+  "style": "v2",
+  "componentFramework": "glass-easel",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents",
+  "permission": {
+    "scope.record": {
+      "desc": "用于音频播放功能"
+    },
+    "scope.writePhotosAlbum": {
+      "desc": "用于保存文件到本地"
+    }
+  }
+}

@@ -1,0 +1,165 @@
+<view class="page-container">
+  <scroll-view class="content-area" scroll-y>
+    <!-- Tab1: 工具主页 -->
+    <view class="tab-content {{activeTab === 0 ? 'active' : ''}}">
+      <view class="content-inner">
+        <view class="page-title">飞行学员工具箱</view>
+        
+        <view class="search-box">
+          <input class="search-input" placeholder="搜索工具" value="{{searchValue}}" bindinput="onSearchInput" />
+        </view>
+
+        <block wx:if="{{!searchValue}}">
+          <view class="featured-section">
+            <view class="section-title-small">推荐</view>
+            <scroll-view class="featured-scroll" scroll-x="true" show-scrollbar="false">
+              <view class="featured-card" bindtap="openTool" data-tool="{{allTools[0]}}">
+                <image class="featured-image" src="{{allTools[0].image}}" mode="aspectFill" />
+                <view class="featured-text">{{allTools[0].name}}</view>
+              </view>
+              <view class="featured-card" bindtap="openTool" data-tool="{{allTools[2]}}">
+                <image class="featured-image" src="{{allTools[2].image}}" mode="aspectFill" />
+                <view class="featured-text">{{allTools[2].name}}</view>
+              </view>
+            </scroll-view>
+          </view>
+
+          <view class="tools-section">
+            <view class="section-title">理论学习</view>
+            <scroll-view class="tools-scroll" scroll-x="true" show-scrollbar="false">
+              <view class="tool-item" wx:for="{{theoryTools}}" wx:key="id" bindtap="openTool" data-tool="{{item}}">
+                <image class="tool-image" src="{{item.image}}" mode="aspectFill" />
+                <view class="tool-text">{{item.name}}</view>
+              </view>
+            </scroll-view>
+          </view>
+
+          <view class="tools-section">
+            <view class="section-title">航校训练</view>
+            <scroll-view class="tools-scroll" scroll-x="true" show-scrollbar="false">
+              <view class="tool-item" wx:for="{{schoolTools}}" wx:key="id" bindtap="openTool" data-tool="{{item}}">
+                <image class="tool-image" src="{{item.image}}" mode="aspectFill" />
+                <view class="tool-text">{{item.name}}</view>
+              </view>
+            </scroll-view>
+          </view>
+
+          <view class="tools-section">
+            <view class="section-title">实用工具</view>
+            <scroll-view class="tools-scroll" scroll-x="true" show-scrollbar="false">
+              <view class="tool-item" wx:for="{{utilityTools}}" wx:key="id" bindtap="openTool" data-tool="{{item}}">
+                <image class="tool-image" src="{{item.image}}" mode="aspectFill" />
+                <view class="tool-text">{{item.name}}</view>
+              </view>
+            </scroll-view>
+          </view>
+
+          <view class="tools-section">
+            <view class="section-title">计算器</view>
+            <scroll-view class="tools-scroll" scroll-x="true" show-scrollbar="false">
+              <view class="tool-item" wx:for="{{calculatorTools}}" wx:key="id" bindtap="openTool" data-tool="{{item}}">
+                <image class="tool-image" src="{{item.image}}" mode="aspectFill" />
+                <view class="tool-text">{{item.name}}</view>
+              </view>
+            </scroll-view>
+          </view>
+        </block>
+
+        <block wx:else>
+          <view class="search-results" wx:if="{{filteredTools.length > 0}}">
+            <view class="search-tool-item" wx:for="{{filteredTools}}" wx:key="id" bindtap="openTool" data-tool="{{item}}">
+              <image class="search-tool-image" src="{{item.image}}" mode="aspectFill" />
+              <view class="search-tool-text">{{item.name}}</view>
+            </view>
+          </view>
+          <view class="no-results" wx:else>
+            <view class="no-results-text">未找到相关工具</view>
+          </view>
+        </block>
+
+        <view class="beian-area">
+          <view class="beian-text" bindtap="copyBeianLink">吉ICP备2024017023号-2X</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- Tab2: 常用链接 -->
+    <view class="tab-content {{activeTab === 1 ? 'active' : ''}}">
+      <view class="content-inner">
+        <view class="page-title">常用链接</view>
+        
+        <view class="links-grid">
+          <view class="link-item" bindtap="openLink" data-url="https://pilot.caac.gov.cn/">
+            <image class="link-image" src="../images/pilot.jpg" mode="aspectFill" />
+            <view class="link-text">飞行人员信息查询</view>
+          </view>
+          <view class="link-item" bindtap="openLink" data-url="https://ams.caac.gov.cn/">
+            <image class="link-image" src="../images/ams.jpg" mode="aspectFill" />
+            <view class="link-text">体检合格证管理系统</view>
+          </view>
+          <view class="link-item" bindtap="openLink" data-url="https://apps.csair.com/">
+            <image class="link-image" src="../images/csn.jpg" mode="aspectFill" />
+            <view class="link-text">南航应用商店</view>
+          </view>
+          <view class="link-item" bindtap="openLink" data-url="https://b2e.csair.com/">
+            <image class="link-image" src="../images/csn.jpg" mode="aspectFill" />
+            <view class="link-text">南航员工旅行</view>
+          </view>
+        </view>
+      </view>
+      <view class="tab2-ad-wrapper">
+        <ad-custom unit-id="adunit-bd819a878ccd8387" bindload="adLoad" binderror="adError" bindclose="adClose"></ad-custom>
+      </view>
+    </view>
+
+    <!-- Tab3: 作者信息 -->
+    <view class="tab-content {{activeTab === 2 ? 'active' : ''}}">
+      <view class="content-inner">
+        <view class="author-title">飞行学员工具箱</view>
+        <view class="author-subtitle">三公里的公路只能带你走三公里，三公里的跑道能带你飞向全世界！——六里路</view>
+        
+        <view class="author-info">
+          <image class="author-avatar" src="../images/developer.jpg" mode="aspectFill" />
+          <view class="author-details">
+            <view class="author-name">作者：庞玺桐（六里路）</view>
+            <view class="author-title-tag">一名民航飞行学员。</view>
+          </view>
+        </view>
+
+        <view class="author-grid">
+          <view class="grid-item" bindtap="openLink" data-url="../shipin/shipin">
+            <image class="grid-image" src="../images/Channels.jpg" mode="aspectFill" />
+            <view class="grid-text">视频</view>
+          </view>
+          <view class="grid-item" bindtap="openLink" data-url="https://oldsai.cn">
+            <image class="grid-image" src="../images/safari.png" mode="aspectFill" />
+            <view class="grid-text">个人网站</view>
+          </view>
+          <view class="grid-item" bindtap="openLink" data-url="https://makerworld.com.cn/@six_miles?appSharePlatform=copy">
+            <image class="grid-image" src="../images/makerworld.png" mode="aspectFill" />
+            <view class="grid-text">3D模型</view>
+          </view>
+          <view class="grid-item" bindtap="openMP">
+            <image class="grid-image" src="../images/logo-mp.ico" mode="aspectFill" />
+            <view class="grid-text">公众号</view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <view class="tab-bar">
+    <view class="tab-item {{activeTab === 0 ? 'active' : ''}}" data-index="0" bindtap="switchTab">
+      <view class="tab-icon">🏠</view>
+      <view class="tab-label">工具</view>
+    </view>
+    <view class="tab-item {{activeTab === 1 ? 'active' : ''}}" data-index="1" bindtap="switchTab">
+      <view class="tab-icon">🔗</view>
+      <view class="tab-label">链接</view>
+    </view>
+    <view class="tab-item {{activeTab === 2 ? 'active' : ''}}" data-index="2" bindtap="switchTab">
+      <view class="tab-icon">👤</view>
+      <view class="tab-label">作者</view>
+    </view>
+  </view>
+</view>
