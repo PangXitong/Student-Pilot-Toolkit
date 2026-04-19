@@ -14,6 +14,7 @@ Page({
       { id: 'heart-rate', name: '心率计算器', image: '../images/HR.png', url: '../heart-rate-calculator/heart-rate-calculator', isLink: false },
       { id: 'unit-converter', name: '单位换算器', image: '../images/unit-converter.png', url: '../unit-converter/unit-converter', isLink: false },
       { id: 'time-calculator', name: '时间计算器', image: '../images/time.png', url: '../time-calculator/time-calculator', isLink: false },
+      { id: 'download-calculator', name: '下载计算器', image: '../images/random.png', url: '../download-calculator/download-calculator', isLink: false },
       { id: 'random-number', name: '随机数生成器', image: '../images/random.png', url: '../random-number/random-number', isLink: false }
     ],
     filteredTools: [],
@@ -33,7 +34,7 @@ Page({
       theoryTools: allTools.filter(t => ['pepec', 'e6b-exercise', 'e6b-calculator', 'e6b-link'].includes(t.id)),
       schoolTools: allTools.filter(t => ['flight-student', 'flight-teacher'].includes(t.id)),
       utilityTools: allTools.filter(t => ['bmi', 'bmr', 'heart-rate'].includes(t.id)),
-      calculatorTools: allTools.filter(t => ['unit-converter', 'time-calculator', 'random-number'].includes(t.id)),
+      calculatorTools: allTools.filter(t => ['unit-converter', 'time-calculator', 'download-calculator', 'random-number'].includes(t.id)),
       filteredTools: allTools
     });
   },

@@ -1,0 +1,111 @@
+<!-- download-calculator.wxml -->
+<scroll-view class="scrollarea" scroll-y type="list">
+  <view class="container">
+    <!-- 标题 -->
+    <view class="title-container">
+      <view class="title">下载计算器</view>
+      <view class="subtitle">输入任意两个值，点击计算按钮计算剩下的值</view>
+    </view>
+    
+    <!-- 文件大小 -->
+    <view class="input-section">
+      <view class="input-label">文件大小</view>
+      <view class="input-row">
+        <input 
+          class="input-field" 
+          type="digit" 
+          placeholder="请输入文件大小" 
+          value="{{fileSize}}"
+          bindinput="onFileSizeInput"
+        />
+        <picker 
+          bindchange="onFileSizeUnitChange" 
+          range="{{fileSizeUnits}}" 
+          value="{{fileSizeUnitIndex}}"
+        >
+          <view class="picker">{{fileSizeUnits[fileSizeUnitIndex]}}</view>
+        </picker>
+      </view>
+    </view>
+    
+    <!-- 下载速度 -->
+    <view class="input-section">
+      <view class="input-label">下载速度</view>
+      <view class="input-row">
+        <input 
+          class="input-field" 
+          type="digit" 
+          placeholder="请输入下载速度" 
+          value="{{downloadSpeed}}"
+          bindinput="onDownloadSpeedInput"
+        />
+        <picker 
+          bindchange="onSpeedUnitChange" 
+          range="{{speedUnits}}" 
+          value="{{downloadSpeedUnitIndex}}"
+        >
+          <view class="picker">{{speedUnits[downloadSpeedUnitIndex]}}</view>
+        </picker>
+      </view>
+    </view>
+    
+    <!-- 下载时间 -->
+    <view class="input-section">
+      <view class="input-label">下载时间</view>
+      <view class="time-inputs">
+        <view class="time-field">
+          <input 
+            class="time-input" 
+            type="digit" 
+            placeholder="0" 
+            value="{{days}}"
+            bindinput="onDaysInput"
+          />
+          <text class="time-unit">天</text>
+        </view>
+        <view class="time-field">
+          <input 
+            class="time-input" 
+            type="digit" 
+            placeholder="0" 
+            value="{{hours}}"
+            bindinput="onHoursInput"
+          />
+          <text class="time-unit">时</text>
+        </view>
+        <view class="time-field">
+          <input 
+            class="time-input" 
+            type="digit" 
+            placeholder="0" 
+            value="{{minutes}}"
+            bindinput="onMinutesInput"
+          />
+          <text class="time-unit">分</text>
+        </view>
+        <view class="time-field">
+          <input 
+            class="time-input" 
+            type="digit" 
+            placeholder="0" 
+            value="{{seconds}}"
+            bindinput="onSecondsInput"
+          />
+          <text class="time-unit">秒</text>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 计算按钮 -->
+    <view class="button-row">
+      <button class="reset-button" bindtap="resetForm">重置</button>
+      <button class="calculate-button" bindtap="calculateMissing">计算</button>
+    </view>
+    
+    <!-- 结果显示 -->
+    <view class="result-section" wx:if="{{result}}">
+      <view class="result-text">{{result}}</view>
+    </view>
+    
+  </view>
+</scroll-view>

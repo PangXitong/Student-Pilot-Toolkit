@@ -1,0 +1,159 @@
+/* download-calculator.wxss */
+
+page {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+  font-family: 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+  color: #333;
+}
+
+.scrollarea {
+  overflow-y: auto;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40rpx 30rpx;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.title-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin-bottom: 50rpx;
+}
+
+.title {
+  font-size: 80rpx;
+  font-weight: bold;
+  color: #1890ff;
+}
+
+.subtitle {
+  font-size: 28rpx;
+  color: #666;
+  margin-top: 15rpx;
+}
+
+.input-section {
+  width: 100%;
+  margin-bottom: 30rpx;
+}
+
+.input-label {
+  font-size: 32rpx;
+  color: #333;
+  margin-bottom: 15rpx;
+  font-weight: 500;
+}
+
+.input-row {
+  display: flex;
+  align-items: center;
+  background-color: #f5f5f5;
+  border-radius: 15rpx;
+  padding: 20rpx;
+}
+
+.input-field {
+  flex: 1;
+  font-size: 32rpx;
+  padding: 10rpx;
+}
+
+.picker {
+  font-size: 32rpx;
+  color: #1890ff;
+  padding: 10rpx 20rpx;
+  background-color: #e6f7ff;
+  border-radius: 10rpx;
+  min-width: 120rpx;
+  text-align: center;
+}
+
+.time-inputs {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.time-field {
+  display: flex;
+  align-items: center;
+  background-color: #f5f5f5;
+  border-radius: 15rpx;
+  padding: 15rpx 20rpx;
+  margin-bottom: 15rpx;
+  width: 45%;
+  box-sizing: border-box;
+}
+
+.time-input {
+  flex: 1;
+  font-size: 32rpx;
+  text-align: center;
+  min-width: 80rpx;
+}
+
+.time-unit {
+  font-size: 28rpx;
+  color: #666;
+  margin-left: 10rpx;
+}
+
+.calculate-button {
+  flex: 2;
+  height: 100rpx;
+  background-color: #1890ff;
+  color: #fff;
+  font-size: 36rpx;
+  font-weight: bold;
+  border-radius: 50rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.button-row {
+  display: flex;
+  width: 100%;
+  margin-top: 40rpx;
+}
+
+.reset-button {
+  flex: 1;
+  height: 100rpx;
+  background-color: #f5f5f5;
+  color: #666;
+  font-size: 36rpx;
+  font-weight: bold;
+  border-radius: 50rpx;
+  margin-right: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.result-section {
+  width: 100%;
+  margin-top: 40rpx;
+  padding: 40rpx;
+  background-color: #e6f7ff;
+  border-radius: 20rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+}
+
+.result-text {
+  font-size: 36rpx;
+  color: #1890ff;
+  font-weight: bold;
+  text-align: center;
+}
