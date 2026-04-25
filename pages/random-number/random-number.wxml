@@ -39,6 +39,31 @@
           <text wx:for="{{rng.results}}" wx:key="index" class="result-number">{{item}}</text>
         </view>
       </view>
+
+      <!-- 历史记录 -->
+      <view class="history-section">
+        <view class="history-header">
+          <view class="history-title">📋 历史记录</view>
+          <button class="delete-old-btn" bindtap="deleteOldHistory" wx:if="{{rngHistory.length > todayCount}}">删除一天前记录</button>
+        </view>
+        <view class="history-stats">今日生成 {{todayCount}} 次</view>
+        <view class="history-list" wx:if="{{rngHistory.length > 0}}">
+          <view wx:for="{{rngHistory}}" wx:key="id" class="history-item">
+            <view class="history-info">
+              <view class="history-date">{{item.date}} {{item.time}}</view>
+              <view class="history-detail">范围: {{item.min}}-{{item.max}} × {{item.count}}{{item.allowRepeat ? '' : '(不重复)'}}</view>
+              <view class="history-results">结果: {{item.resultsText}}{{item.hasMore ? '...' : ''}}</view>
+            </view>
+            <view class="history-actions">
+              <text class="delete-btn" bindtap="deleteHistoryItem" data-id="{{item.id}}">删除</text>
+              <text class="today-tag" wx:if="{{item.isToday}}">今日</text>
+            </view>
+          </view>
+        </view>
+        <view class="history-empty" wx:if="{{rngHistory.length === 0}}">
+          <view class="history-empty-text">暂无历史记录</view>
+        </view>
+      </view>
     </view>
 
     <!-- ② 是 / 否 决策器 -->

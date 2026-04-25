@@ -8,6 +8,7 @@ Page({
       { id: 'e6b-calculator', name: 'E6B领航计算器', image: '../images/e6b.jpg', url: '../e6b-flight-computer/e6b-flight-computer', isLink: false },
       { id: 'e6b-link', name: 'E6B领航计算尺链接', image: '../images/e6b.jpg', url: 'https://mediafiles.aero.und.edu/aero.und.edu/aviation/trainers/e6b/', isLink: true },
       { id: 'flight-student', name: '学员训练时间计算器', image: '../images/FLT.png', url: '../flight-time-calculator/flight-time-calculator', isLink: false },
+      { id: 'camera-watermark', name: '查人报班水印相机', image: '../images/camera.png', url: '../camera-watermark/camera-watermark', isLink: false },
       { id: 'flight-teacher', name: '教员训练时间计算器', image: '../images/FLT.png', url: '../flight-time-calculator-teacher/flight-time-calculator-teacher', isLink: false },
       { id: 'bmi', name: 'BMI计算器', image: '../images/BMI.png', url: '../bmi-calculator/bmi-calculator', isLink: false },
       { id: 'bmr', name: 'BMR计算器', image: '../images/BMR.png', url: '../bmr-calculator/bmr-calculator', isLink: false },
@@ -32,7 +33,7 @@ Page({
     const allTools = this.data.allTools;
     this.setData({
       theoryTools: allTools.filter(t => ['pepec', 'e6b-exercise', 'e6b-calculator', 'e6b-link'].includes(t.id)),
-      schoolTools: allTools.filter(t => ['flight-student', 'flight-teacher'].includes(t.id)),
+      schoolTools: allTools.filter(t => ['flight-student', 'camera-watermark', 'flight-teacher'].includes(t.id)),
       utilityTools: allTools.filter(t => ['bmi', 'bmr', 'heart-rate'].includes(t.id)),
       calculatorTools: allTools.filter(t => ['unit-converter', 'time-calculator', 'download-calculator', 'random-number'].includes(t.id)),
       filteredTools: allTools

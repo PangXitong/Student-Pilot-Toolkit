@@ -1,0 +1,103 @@
+<!--camera-watermark.wxml-->
+<scroll-view class="scrollarea" scroll-y type="list">
+  <view class="container">
+
+    <!-- 离屏水印画布（隐藏） -->
+    <canvas type="2d" id="watermark-canvas" class="hidden-canvas" />
+
+    <!-- 标题 -->
+    <view class="title-container">
+      <view class="title">查人报班水印相机</view>
+    </view>
+
+    <!-- 拍照区域 -->
+    <view class="camera-area-two" wx:if="{{!photoPath}}">
+      <button class="camera-button-left" bindtap="takePhoto">
+        <text class="camera-button-text">拍照</text>
+      </button>
+      <button class="camera-button-right" bindtap="importPhoto">
+        <text class="camera-button-text">导入</text>
+      </button>
+    </view>
+
+    <view class="camera-area-two" wx:if="{{photoPath}}">
+      <button class="camera-button-left" bindtap="takePhoto">
+        <text class="camera-button-text">重拍</text>
+      </button>
+      <button class="camera-button-right" bindtap="importPhoto">
+        <text class="camera-button-text">重新导入</text>
+      </button>
+    </view>
+
+    <image wx:if="{{photoPath}}" class="photo-preview" src="{{photoPath}}" mode="aspectFit" />
+
+    <!-- 水印信息填写 -->
+    <view class="watermark-form">
+      <view class="form-title">
+        <text>水印信息（全选填）</text>
+        <button class="clear-form-btn" bindtap="clearForm" size="mini" plain="true">重置</button>
+      </view>
+
+      <view class="input-row">
+        <view class="input-label">班级</view>
+        <input class="input-box" value="{{form.classInfo}}" bindinput="onInput" data-field="classInfo" placeholder="例如：24201" />
+      </view>
+
+      <view class="input-row">
+        <view class="input-label">应到</view>
+        <input class="input-box" value="{{form.absent}}" bindinput="onInput" data-field="absent" placeholder="例如：40" />
+      </view>
+
+      <view class="input-row">
+        <view class="input-label">实到</view>
+        <input class="input-box" value="{{form.present}}" bindinput="onInput" data-field="present" placeholder="例如：39" />
+      </view>
+
+      <view class="input-row">
+        <view class="input-label">备注</view>
+        <input class="input-box" value="{{form.remark}}" bindinput="onInput" data-field="remark" placeholder="例如：1人公差" />
+      </view>
+
+      <view class="input-row toggle-row">
+        <checkbox-group bindchange="onToggleTime">
+          <label class="toggle-label">
+            <checkbox value="true" checked="{{showTime}}" color="#1890ff" />
+            <text class="toggle-text">显示拍摄时间</text>
+          </label>
+        </checkbox-group>
+      </view>
+
+      <view class="input-row">
+        <view class="input-label">宿舍</view>
+        <input class="input-box" value="{{form.dorm}}" bindinput="onInput" data-field="dorm" placeholder="例如：宁9-999 9床" />
+      </view>
+
+      <view class="input-row">
+        <view class="input-label">问题</view>
+        <input class="input-box" value="{{form.question}}" bindinput="onInput" data-field="question" placeholder="例如：内务不整" />
+      </view>
+    </view>
+
+    <!-- 确认生成水印按钮 -->
+    <button class="action-button" bindtap="generateWatermark" wx:if="{{photoPath && !watermarkedPath}}">生成水印</button>
+
+    <!-- 水印预览区域 -->
+    <view class="watermark-preview" wx:if="{{watermarkedPath}}">
+      <view class="preview-label">水印预览</view>
+      <image class="watermarked-image" src="{{watermarkedPath}}" mode="aspectFit" />
+    </view>
+
+    <!-- 操作按钮 -->
+    <view class="action-buttons" wx:if="{{watermarkedPath}}">
+      <button class="reset-button" bindtap="resetAll">重置</button>
+      <button class="save-button" bindtap="saveToAlbum">保存照片</button>
+    </view>
+
+    <!-- 广告 -->
+    <view class="ad-wrap">
+      <ad-custom unit-id="adunit-2d6a3185151841c7" bindload="adLoad" binderror="adError" bindclose="adClose"></ad-custom>
+    </view>
+
+    <view class="bottom-spacing"></view>
+  </view>
+</scroll-view>

@@ -45,7 +45,7 @@
           </view>
 
           <view class="tools-section">
-            <view class="section-title">实用工具</view>
+            <view class="section-title">健康管理</view>
             <scroll-view class="tools-scroll" scroll-x="true" show-scrollbar="false">
               <view class="tool-item" wx:for="{{utilityTools}}" wx:key="id" bindtap="openTool" data-tool="{{item}}">
                 <image class="tool-image" src="{{item.image}}" mode="aspectFill" />

@@ -9,6 +9,9 @@ Page({
       allowRepeat: true,
       results: []
     },
+    // 随机数历史记录
+    rngHistory: [],
+    todayCount: 0,
     // ② 是/否
     yesno: {
       answer: ''
@@ -25,6 +28,56 @@ Page({
     }
   },
 
+  onLoad: function() {
+    this.loadHistory();
+  },
+
+  onShow: function() {
+    this.loadHistory();
+  },
+
+  loadHistory: function() {
+    const history = wx.getStorageSync('rng_history') || [];
+    const today = this.getTodayDate();
+    history.forEach(item => {
+      item.isToday = item.date === today;
+      // 确保 results 是数组
+      if (!Array.isArray(item.results)) {
+        item.results = [];
+      }
+      // 兼容旧记录：重建 resultsText 和 hasMore
+      if (!item.resultsText && Array.isArray(item.results)) {
+        item.resultsText = item.results.join(', ');
+      }
+      if (item.hasMore === undefined) {
+        item.hasMore = item.count > 10;
+      }
+    });
+    const todayRecords = history.filter(item => item.date === today);
+    this.setData({
+      rngHistory: history,
+      todayCount: todayRecords.length
+    });
+  },
+
+  getTodayDate: function() {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  },
+
+  getTodayTime: function() {
+    const now = new Date();
+    return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+  },
+
+  isTodayRecord: function(dateStr) {
+    return dateStr === this.getTodayDate();
+  },
+
+  saveHistory: function(history) {
+    wx.setStorageSync('rng_history', history);
+  },
+
   // ══════════════════════════════════════════
   //  ① 随机数生成器
   // ══════════════════════════════════════════
@@ -35,7 +88,6 @@ Page({
     const val = raw === '' ? '' : parseInt(raw, 10);
     const rng = Object.assign({}, this.data.rng);
     rng[field] = isNaN(val) ? '' : val;
-    // 数量变为 1 时重置 allowRepeat
     if (field === 'count' && val === 1) rng.allowRepeat = true;
     this.setData({ rng });
   },
@@ -48,7 +100,6 @@ Page({
   generateNumbers: function () {
     const { min, max, count, allowRepeat } = this.data.rng;
 
-    // 输入校验
     if (min === '' || max === '' || count === '') {
       wx.showToast({ title: '请填写完整参数', icon: 'none' }); return;
     }
@@ -73,7 +124,6 @@ Page({
         results.push(Math.floor(Math.random() * rangeSize) + iMin);
       }
     } else {
-      // Fisher-Yates 抽样
       const pool = [];
       for (let i = iMin; i <= iMax; i++) pool.push(i);
       for (let i = pool.length - 1; i > 0; i--) {
@@ -85,6 +135,52 @@ Page({
 
     const rng = Object.assign({}, this.data.rng, { results });
     this.setData({ rng });
+
+    const history = this.data.rngHistory;
+    const newRecord = {
+      id: Date.now(),
+      date: this.getTodayDate(),
+      time: this.getTodayTime(),
+      min: iMin,
+      max: iMax,
+      count: iCount,
+      allowRepeat: allowRepeat,
+      results: JSON.parse(JSON.stringify(results.slice(0, 10))),
+      resultsText: results.slice(0, 10).join(', '),
+      hasMore: iCount > 10,
+      isToday: true
+    };
+    history.unshift(newRecord);
+    this.saveHistory(history);
+    this.setData({
+      rngHistory: history,
+      todayCount: history.filter(item => item.date === this.getTodayDate()).length
+    });
+  },
+
+  deleteHistoryItem: function(e) {
+    const id = e.currentTarget.dataset.id;
+    const record = this.data.rngHistory.find(item => item.id === id);
+    if (record && this.isTodayRecord(record.date)) {
+      wx.showToast({ title: '为防止伪造记录，不支持删除今天的历史记录', icon: 'none' });
+      return;
+    }
+    const history = this.data.rngHistory.filter(item => item.id !== id);
+    this.saveHistory(history);
+    this.setData({
+      rngHistory: history,
+      todayCount: history.filter(item => item.date === this.getTodayDate()).length
+    });
+  },
+
+  deleteOldHistory: function() {
+    const history = this.data.rngHistory.filter(item => !this.isTodayRecord(item.date));
+    this.saveHistory(history);
+    this.setData({
+      rngHistory: history,
+      todayCount: 0
+    });
+    wx.showToast({ title: '已删除一天前记录', icon: 'success' });
   },
 
   // ══════════════════════════════════════════
@@ -127,7 +223,6 @@ Page({
       wx.showToast({ title: 'n 最大支持 20（避免溢出）', icon: 'none' }); return;
     }
 
-    // 计算阶乘（用 BigInt 避免大数溢出）
     const factorial = (x) => {
       let result = BigInt(1);
       for (let i = 2; i <= x; i++) result *= BigInt(i);
@@ -138,8 +233,8 @@ Page({
     const fR = factorial(iR);
     const fNR = factorial(iN - iR);
 
-    const perm = fN / fNR;                // P(n,r) = n! / (n-r)!
-    const comb = fN / (fR * fNR);         // C(n,r) = n! / (r! * (n-r)!)
+    const perm = fN / fNR;
+    const comb = fN / (fR * fNR);
 
     const pnc = Object.assign({}, this.data.pnc, {
       calculated: true,
@@ -149,22 +244,5 @@ Page({
       combinationFormula: `${iN}! / (${iR}! × ${iN - iR}!)`
     });
     this.setData({ pnc });
-  },
-
-  // 分享给朋友
-  onShareAppMessage() {
-    return {
-      title: '随机数生成器',
-      path: '/pages/random-number/random-number'
-    }
-  },
-
-  // 分享到朋友圈
-  onShareTimeline() {
-    return {
-      title: '随机数生成器',
-      query: '',
-      imageUrl: ''
-    }
   }
-})
+});

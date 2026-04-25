@@ -16,7 +16,8 @@
     "pages/PEPEC/PEPEC",
     "pages/flight-time-calculator/flight-time-calculator",
     "pages/flight-time-calculator-teacher/flight-time-calculator-teacher",
-    "pages/download-calculator/download-calculator"
+    "pages/download-calculator/download-calculator",
+    "pages/camera-watermark/camera-watermark"
   ],
   "window": {
     "navigationBarTextStyle": "black",

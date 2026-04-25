@@ -192,3 +192,97 @@ page {
 .bottom-spacing {
   height: 50rpx;
 }
+
+/* 历史记录 */
+.history-section {
+  margin-top: 28rpx;
+  background-color: #fff;
+  border-radius: 14rpx;
+  padding: 24rpx;
+  border: 2rpx solid #e6f7ff;
+}
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+.history-title {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333;
+}
+.history-stats {
+  font-size: 24rpx;
+  color: #1890ff;
+}
+.delete-old-btn {
+  flex-shrink: 0;
+  height: 64rpx;
+  padding: 0 20rpx;
+  background-color: #fff1f0;
+  color: #ff4d4f;
+  font-size: 26rpx;
+  border-radius: 10rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+  max-height: 360rpx;
+  overflow-y: auto;
+}
+.history-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16rpx;
+  background-color: #fafafa;
+  border-radius: 10rpx;
+}
+.history-info {
+  flex: 1;
+}
+.history-date {
+  font-size: 22rpx;
+  color: #999;
+  margin-bottom: 6rpx;
+}
+.history-detail {
+  font-size: 24rpx;
+  color: #333;
+}
+.history-results {
+  font-size: 24rpx;
+  color: #666;
+  margin-top: 6rpx;
+}
+.history-actions {
+  display: flex;
+  align-items: center;
+  margin-left: 16rpx;
+}
+.delete-btn {
+  color: #ff4d4f;
+  font-size: 26rpx;
+  padding: 8rpx 16rpx;
+}
+.today-tag {
+  color: #52c41a;
+  font-size: 24rpx;
+  padding: 8rpx 16rpx;
+}
+.history-empty {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40rpx 0;
+}
+.history-empty-text {
+  font-size: 26rpx;
+  color: #999;
+}
