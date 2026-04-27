@@ -244,5 +244,18 @@ Page({
       combinationFormula: `${iN}! / (${iR}! × ${iN - iR}!)`
     });
     this.setData({ pnc });
+  },
+
+  onShareAppMessage() {
+    return {
+      title: '随机数生成器',
+      path: '/pages/random-number/random-number'
+    };
+  },
+
+  onShareTimeline() {
+    return {
+      title: '随机数生成器'
+    };
   }
 });

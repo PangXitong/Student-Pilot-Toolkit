@@ -246,5 +246,18 @@ Page({
         wx.showToast({ title: '保存失败，请检查权限', icon: 'none' });
       }
     });
+  },
+
+  onShareAppMessage() {
+    return {
+      title: '查人报班水印相机',
+      path: '/pages/camera-watermark/camera-watermark'
+    };
+  },
+
+  onShareTimeline() {
+    return {
+      title: '查人报班水印相机'
+    };
   }
 });

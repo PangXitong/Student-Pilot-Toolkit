@@ -185,5 +185,18 @@ Page({
       const totalSeconds = fileSizeBytes / speedBytesPerSec;
       this.setData({ result: '下载时间: ' + this.formatTime(totalSeconds) });
     }
+  },
+
+  onShareAppMessage() {
+    return {
+      title: '下载计算器',
+      path: '/pages/download-calculator/download-calculator'
+    };
+  },
+
+  onShareTimeline() {
+    return {
+      title: '下载计算器'
+    };
   }
 });
