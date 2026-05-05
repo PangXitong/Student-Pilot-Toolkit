@@ -30,9 +30,22 @@ Page({
     speedIndex: 3,
     speedOptions: [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0],
     isCurrentFavorite: false,
+    // 录音相关数据
+    recordingList: [],
+    isRecording: false,
+    currentRecordingIndex: -1,
+    isPlayingRecording: false,
+    recordingProgress: 0,
+    recordingCurrentTime: 0,
+    recordingDuration: 0,
+    recordingCurrentTimeText: '00:00',
+    recordingDurationText: '00:00',
   },
 
   audioContext: null,
+  recorderManager: null,
+  recordingAudioContext: null,
+  recordingStartTime: 0,
 
   onLoad() {
     this.audioContext = wx.createInnerAudioContext();
@@ -42,8 +55,18 @@ Page({
     this.audioContext.obeyMuteSwitch = false; // 忽略静音开关
     this.audioContext.volume = 1.0; // 设置最大音量
     
+    // 初始化录音管理器
+    this.recorderManager = wx.getRecorderManager();
+    this.initRecorderManager();
+    
+    // 初始化录音播放上下文
+    this.recordingAudioContext = wx.createInnerAudioContext();
+    this.initRecordingAudioContext();
+    
     // 加载本地存储的文件列表
     this.loadAudioList();
+    // 加载本地存储的录音列表
+    this.loadRecordingList();
     
     this.audioContext.onEnded(() => {
       if (this.data.autoPlayNext) {
@@ -87,8 +110,15 @@ Page({
 
   onUnload() {
     if (this.audioContext) {
-      this.audioContext.stop();
-      this.audioContext.destroy();
+      try { this.audioContext.stop(); } catch (e) {}
+      try { this.audioContext.destroy && this.audioContext.destroy(); } catch (e) {}
+    }
+    if (this.recordingAudioContext) {
+      try { this.recordingAudioContext.stop(); } catch (e) {}
+      try { this.recordingAudioContext.destroy && this.recordingAudioContext.destroy(); } catch (e) {}
+    }
+    if (this.recorderManager) {
+      try { this.recorderManager.stop(); } catch (e) {}
     }
   },
 
@@ -640,5 +670,318 @@ Page({
       speedIndex: index 
     });
     this.audioContext.playbackRate = rate;
+  },
+
+  // ---------- 录音功能 ----------
+  initRecorderManager() {
+    // 录音开始事件
+    this.recorderManager.onStart(() => {
+      this.recordingStartTime = Date.now();
+      console.log('录音开始');
+    });
+
+    // 录音停止事件
+    this.recorderManager.onStop((res) => {
+      console.log('录音结束', res);
+      const duration = Date.now() - this.recordingStartTime;
+      this.saveRecording(res.tempFilePath, duration);
+    });
+
+    // 录音错误事件
+    this.recorderManager.onError((err) => {
+      console.error('录音错误', err);
+      wx.showToast({
+        title: '录音失败',
+        icon: 'none',
+      });
+      this.setData({ isRecording: false });
+    });
+  },
+
+  initRecordingAudioContext() {
+    this.recordingAudioContext.onPlay(() => {
+      console.log('录音播放开始');
+      this.setData({ isPlayingRecording: true });
+    });
+
+    this.recordingAudioContext.onPause(() => {
+      console.log('录音播放暂停');
+      this.setData({ isPlayingRecording: false });
+    });
+
+    this.recordingAudioContext.onStop(() => {
+      console.log('录音播放停止');
+      this.setData({ 
+        isPlayingRecording: false, 
+        currentRecordingIndex: -1,
+        recordingProgress: 0,
+        recordingCurrentTime: 0,
+        recordingCurrentTimeText: '00:00',
+      });
+    });
+
+    this.recordingAudioContext.onEnded(() => {
+      console.log('录音播放结束');
+      this.setData({ 
+        isPlayingRecording: false, 
+        currentRecordingIndex: -1,
+        recordingProgress: 0,
+        recordingCurrentTime: 0,
+        recordingCurrentTimeText: '00:00',
+      });
+    });
+
+    this.recordingAudioContext.onTimeUpdate(() => {
+      const ct = this.recordingAudioContext.currentTime;
+      const dur = this.recordingAudioContext.duration;
+      if (dur > 0) {
+        this.setData({ 
+          recordingCurrentTime: ct, 
+          recordingDuration: dur, 
+          recordingProgress: (ct / dur) * 100,
+          recordingCurrentTimeText: this._formatTime(ct),
+          recordingDurationText: this._formatTime(dur),
+        });
+      }
+    });
+
+    this.recordingAudioContext.onCanplay(() => {
+      console.log('录音可以播放了');
+      const dur = this.recordingAudioContext.duration;
+      if (dur > 0) {
+        this.setData({
+          recordingDuration: dur,
+          recordingDurationText: this._formatTime(dur),
+        });
+      }
+    });
+
+    this.recordingAudioContext.onError((err) => {
+      console.error('录音播放错误', err);
+      this.setData({ isPlayingRecording: false });
+    });
+  },
+
+  onStartStopRecord() {
+    if (this.data.isRecording) {
+      // 停止录音
+      this.recorderManager.stop();
+      this.setData({ isRecording: false });
+    } else {
+      // 开始录音
+      // 先停止正在播放的录音
+      if (this.data.isPlayingRecording) {
+        this.recordingAudioContext.stop();
+      }
+      // 先停止正在播放的音频
+      if (this.data.isPlaying) {
+        this.audioContext.stop();
+        this.setData({ isPlaying: false });
+      }
+      
+      const options = {
+        duration: 600000, // 最长10分钟
+        sampleRate: 16000,
+        numberOfChannels: 1,
+        encodeBitRate: 48000,
+        format: 'mp3',
+        frameSize: 50,
+      };
+      
+      this.recorderManager.start(options);
+      this.setData({ isRecording: true });
+    }
+  },
+
+  saveRecording(filePath, duration) {
+    const currentFileName = this.data.currentFileName !== '暂无文件' 
+      ? this.data.currentFileName.replace(/\.[^/.]+$/, '') 
+      : '录音';
+    const now = new Date();
+    const timeStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}${String(now.getSeconds()).padStart(2, '0')}`;
+    const recordingName = `${currentFileName}_${timeStr}.mp3`;
+    
+    // 格式化时长
+    const formattedDuration = this._formatDuration(duration);
+    
+    const newRecording = {
+      name: recordingName,
+      filePath: filePath,
+      duration: formattedDuration,
+      createTime: now.getTime(),
+    };
+    
+    const recordingList = [newRecording, ...this.data.recordingList];
+    this.setData({ recordingList });
+    
+    // 保存到本地存储
+    this.saveRecordingList();
+    
+    wx.showToast({
+      title: '录音保存成功',
+      icon: 'success',
+    });
+  },
+
+  _formatDuration(ms) {
+    const seconds = Math.floor(ms / 1000);
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}:${String(s).padStart(2, '0')}`;
+  },
+
+  loadRecordingList() {
+    try {
+      const recordingList = wx.getStorageSync('PEPEC_recordingList');
+      if (recordingList && Array.isArray(recordingList)) {
+        this.setData({ recordingList });
+      }
+    } catch (e) {
+      console.error('加载录音列表失败', e);
+    }
+  },
+
+  saveRecordingList() {
+    try {
+      wx.setStorageSync('PEPEC_recordingList', this.data.recordingList);
+    } catch (e) {
+      console.error('保存录音列表失败', e);
+    }
+  },
+
+  onTogglePlayRecording() {
+    // 如果没有录音，给出提示
+    if (this.data.recordingList.length === 0) {
+      wx.showToast({
+        title: '暂无录音',
+        icon: 'none',
+      });
+      return;
+    }
+    
+    let index = this.data.currentRecordingIndex;
+    if (index < 0) {
+      index = 0;
+    }
+    
+    const recording = this.data.recordingList[index];
+    
+    if (this.data.isPlayingRecording) {
+      this.recordingAudioContext.pause();
+    } else {
+      if (this.data.isPlaying) {
+        this.audioContext.stop();
+        this.setData({ isPlaying: false });
+      }
+      
+      if (this.data.currentRecordingIndex !== index) {
+        this.recordingAudioContext.stop();
+        this.recordingAudioContext.src = recording.filePath;
+      }
+      this.recordingAudioContext.play();
+      this.setData({ currentRecordingIndex: index });
+    }
+  },
+
+  onRecordingProgressChange(e) {
+    if (!this.data.recordingList.length || !this.data.recordingDuration) return;
+    const targetTime = (e.detail.value / 100) * this.data.recordingDuration;
+    this.recordingAudioContext.seek(targetTime);
+  },
+
+  onRecordingItemTap(e) {
+    const index = e.currentTarget.dataset.index;
+    const recording = this.data.recordingList[index];
+    
+    // 如果点击的是当前正在播放的录音
+    if (this.data.currentRecordingIndex === index && this.data.isPlayingRecording) {
+      this.recordingAudioContext.pause();
+      return;
+    }
+    
+    // 先停止正在播放的音频
+    if (this.data.isPlaying) {
+      this.audioContext.stop();
+      this.setData({ isPlaying: false });
+    }
+    
+    // 播放录音
+    this.recordingAudioContext.stop();
+    this.recordingAudioContext.src = recording.filePath;
+    this.recordingAudioContext.play();
+    this.setData({ 
+      currentRecordingIndex: index,
+      recordingProgress: 0,
+      recordingCurrentTime: 0,
+      recordingCurrentTimeText: '00:00',
+    });
+  },
+
+  onDeleteRecording(e) {
+    const index = e.currentTarget.dataset.index;
+    wx.showModal({
+      title: '删除录音',
+      content: '确定要删除这条录音吗？',
+      success: (res) => {
+        if (res.confirm) {
+          // 如果删除的是正在播放的录音
+          if (this.data.currentRecordingIndex === index) {
+            this.recordingAudioContext.stop();
+            this.setData({ 
+              currentRecordingIndex: -1, 
+              isPlayingRecording: false,
+              recordingProgress: 0,
+              recordingCurrentTime: 0,
+              recordingCurrentTimeText: '00:00',
+              recordingDuration: 0,
+              recordingDurationText: '00:00',
+            });
+          }
+          
+          const recordingList = this.data.recordingList.filter((_, i) => i !== index);
+          this.setData({ recordingList });
+          this.saveRecordingList();
+          
+          wx.showToast({
+            title: '删除成功',
+            icon: 'success',
+          });
+        }
+      },
+    });
+  },
+
+  onClearRecordings() {
+    wx.showModal({
+      title: '清空录音',
+      content: '确定要清空所有录音吗？',
+      success: (res) => {
+        if (res.confirm) {
+          this.recordingAudioContext.stop();
+          this.setData({ 
+            recordingList: [], 
+            currentRecordingIndex: -1, 
+            isPlayingRecording: false,
+            recordingProgress: 0,
+            recordingCurrentTime: 0,
+            recordingCurrentTimeText: '00:00',
+            recordingDuration: 0,
+            recordingDurationText: '00:00',
+          });
+          
+          // 清除本地存储
+          try {
+            wx.removeStorageSync('PEPEC_recordingList');
+          } catch (e) {
+            console.error('清除录音存储失败', e);
+          }
+          
+          wx.showToast({
+            title: '清空成功',
+            icon: 'success',
+          });
+        }
+      },
+    });
   },
 });

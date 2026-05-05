@@ -652,3 +652,186 @@
 .speed-picker-close-btn::after {
   border: none;
 }
+
+/* 录音模块 */
+.recording-section {
+  background-color: #ffffff;
+  border-radius: 12rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+.recording-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 24rpx 12rpx;
+}
+
+.recording-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40rpx;
+  padding: 20rpx 0;
+}
+
+.record-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1890ff 0%, #4facfe 100%);
+  box-shadow: 0 6rpx 20rpx rgba(24, 144, 255, 0.4);
+  transition: all 0.2s ease;
+}
+
+.record-btn.recording {
+  background: linear-gradient(135deg, #ff4d4f 0%, #ff7875 100%);
+  box-shadow: 0 6rpx 20rpx rgba(255, 77, 79, 0.4);
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.record-icon {
+  font-size: 60rpx;
+}
+
+.record-label {
+  font-size: 24rpx;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.play-recording-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #52c41a 0%, #73d13d 100%);
+  box-shadow: 0 6rpx 20rpx rgba(82, 196, 26, 0.4);
+  transition: all 0.2s ease;
+}
+
+.play-recording-btn.playing {
+  background: linear-gradient(135deg, #faad14 0%, #ffc53d 100%);
+  box-shadow: 0 6rpx 20rpx rgba(250, 173, 20, 0.4);
+}
+
+.play-recording-icon {
+  font-size: 60rpx;
+}
+
+.play-recording-label {
+  font-size: 24rpx;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+/* 录音播放进度条 */
+.recording-progress-section {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 0 24rpx 20rpx;
+}
+
+.recording-time-text {
+  font-size: 24rpx;
+  color: #666;
+  font-weight: 500;
+  min-width: 80rpx;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.recording-progress-slider {
+  flex: 1;
+  margin: 0;
+}
+
+.recording-list-scroll {
+  height: 300rpx;
+  padding: 0 8rpx;
+  border-top: 1rpx solid #f0f0f0;
+}
+
+.recording-item {
+  display: flex;
+  align-items: center;
+  padding: 20rpx 16rpx;
+  border-radius: 10rpx;
+  margin: 0 8rpx 4rpx;
+  transition: background-color 0.15s ease;
+}
+
+.recording-item:active {
+  background-color: #f0f0f0;
+}
+
+.recording-item.active {
+  background-color: #e6f4ff;
+}
+
+.recording-index {
+  font-size: 26rpx;
+  color: #999;
+  margin-right: 12rpx;
+  min-width: 50rpx;
+  font-variant-numeric: tabular-nums;
+}
+
+.recording-name {
+  flex: 1;
+  font-size: 28rpx;
+  color: #333;
+  word-break: break-all;
+}
+
+.recording-item.active .recording-name {
+  color: #1890ff;
+  font-weight: 600;
+}
+
+.recording-duration {
+  font-size: 24rpx;
+  color: #999;
+  margin-right: 12rpx;
+}
+
+.recording-play-icon {
+  font-size: 24rpx;
+  color: #1890ff;
+  margin-right: 12rpx;
+}
+
+.recording-delete-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 50%;
+  background-color: #fff1f0;
+  transition: background-color 0.15s ease;
+}
+
+.recording-delete-btn:active {
+  background-color: #ffccc7;
+}
+
+.delete-icon {
+  font-size: 28rpx;
+}

@@ -128,6 +128,64 @@
       </scroll-view>
     </view>
 
+    <!-- 录音模块 -->
+    <view class="recording-section">
+      <view class="recording-header">
+        <text class="section-label">我的录音</text>
+        <text class="clear-btn" bindtap="onClearRecordings" wx:if="{{recordingList.length > 0}}">清空</text>
+      </view>
+
+      <!-- 录音控制按钮 -->
+      <view class="recording-controls">
+        <view class="record-btn {{isRecording ? 'recording' : ''}}" bindtap="onStartStopRecord">
+          <text class="record-icon">{{isRecording ? '⏹' : '🎤'}}</text>
+          <text class="record-label">{{isRecording ? '停止录音' : '开始录音'}}</text>
+        </view>
+        <view class="play-recording-btn {{isPlayingRecording ? 'playing' : ''}}" bindtap="onTogglePlayRecording">
+          <text class="play-recording-icon">{{isPlayingRecording ? '⏸' : '▶'}}</text>
+          <text class="play-recording-label">{{isPlayingRecording ? '暂停播放' : '播放录音'}}</text>
+        </view>
+      </view>
+
+      <!-- 录音播放进度条 -->
+      <view class="recording-progress-section">
+        <text class="recording-time-text">{{recordingCurrentTimeText}}</text>
+        <slider
+          class="recording-progress-slider"
+          min="0"
+          max="100"
+          value="{{recordingProgress}}"
+          activeColor="#1890ff"
+          backgroundColor="#e8e8e8"
+          block-size="14"
+          bindchange="onRecordingProgressChange"
+        />
+        <text class="recording-time-text">{{recordingDurationText}}</text>
+      </view>
+
+      <!-- 录音列表 -->
+      <scroll-view class="recording-list-scroll" scroll-y>
+        <view
+          wx:for="{{recordingList}}"
+          wx:key="index"
+          class="recording-item {{currentRecordingIndex === index ? 'active' : ''}}"
+          data-index="{{index}}"
+          bindtap="onRecordingItemTap"
+        >
+          <text class="recording-index">{{index + 1}}.</text>
+          <text class="recording-name">{{item.name}}</text>
+          <text class="recording-duration">{{item.duration || '0:00'}}</text>
+          <text class="recording-play-icon" wx:if="{{currentRecordingIndex === index && isPlayingRecording}}">▶</text>
+          <view class="recording-delete-btn" catchtap="onDeleteRecording" data-index="{{index}}">
+            <text class="delete-icon">🗑️</text>
+          </view>
+        </view>
+        <view wx:if="{{recordingList.length === 0}}" class="empty-hint">
+          <text>暂无录音，点击上方按钮开始录音</text>
+        </view>
+      </scroll-view>
+    </view>
+
   </view>
 
   <!-- 学号输入弹窗（已注释）
