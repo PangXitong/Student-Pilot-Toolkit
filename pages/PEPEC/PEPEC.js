@@ -12,6 +12,9 @@ var JSZip = require('../../utils/jszip-wrapper.js');
 Page({
   data: {
     audioList: [],
+    filteredAudioList: [],
+    favoriteCount: 0,
+    otherCount: 0,
     currentIndex: -1,
     currentFileName: '暂无文件',
     isPlaying: false,
@@ -24,13 +27,11 @@ Page({
     autoPlayNext: false,
     playModeText: '顺序练习',
     showInputModal: false,
-    // studentIdInput: '',
     playbackRate: 1.0,
     showSpeedPicker: false,
     speedIndex: 3,
     speedOptions: [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0],
     isCurrentFavorite: false,
-    // 录音相关数据
     recordingList: [],
     isRecording: false,
     currentRecordingIndex: -1,
@@ -40,6 +41,8 @@ Page({
     recordingDuration: 0,
     recordingCurrentTimeText: '00:00',
     recordingDurationText: '00:00',
+    fileListMode: 'all',
+    showModePicker: false,
   },
 
   audioContext: null,
@@ -203,6 +206,7 @@ Page({
     });
 
     this.setData({ audioList: merged });
+    this.updateFilteredFileList();
     wx.showToast({ title: `导入成功，共${merged.length}个文件`, icon: 'success' });
 
     if (this.data.currentIndex === -1 && merged.length > 0) {
@@ -228,6 +232,7 @@ Page({
       const audioList = wx.getStorageSync('PEPEC_audioList');
       if (audioList && Array.isArray(audioList)) {
         this.setData({ audioList });
+        this.updateFilteredFileList();
       }
     } catch (e) {
       console.error('加载音频列表失败', e);
@@ -305,6 +310,7 @@ Page({
       audioList: audioList,
       isCurrentFavorite: audioList[index].isFavorite
     });
+    this.updateFilteredFileList();
     
     this.saveAudioList();
     
@@ -366,6 +372,7 @@ Page({
         if (!res.confirm) return;
         this.audioContext.stop();
         this.setData({ audioList: [], currentIndex: -1, currentFileName: '暂无文件', isPlaying: false, progress: 0, currentTime: 0, duration: 0, currentTimeText: '00:00', durationText: '00:00' });
+        this.updateFilteredFileList();
         // 清除本地存储
         try {
           wx.removeStorageSync('PEPEC_audioList');
@@ -982,6 +989,46 @@ Page({
           });
         }
       },
+    });
+  },
+
+  onToggleFileListMode() {
+    this.setData({ showModePicker: true });
+  },
+
+  onSelectMode(e) {
+    const mode = e.currentTarget.dataset.mode;
+    const filteredList = this.getFilteredFileListByMode(mode);
+    this.setData({
+      fileListMode: mode,
+      filteredAudioList: filteredList,
+      showModePicker: false
+    });
+  },
+
+  onCloseModePicker() {
+    this.setData({ showModePicker: false });
+  },
+
+  // 根据模式获取过滤后的文件列表
+  getFilteredFileListByMode(mode) {
+    const { audioList } = this.data;
+    if (mode === 'favorite') {
+      return audioList.filter(item => item.isFavorite);
+    } else if (mode === 'other') {
+      return audioList.filter(item => !item.isFavorite);
+    }
+    return audioList;
+  },
+
+  updateFilteredFileList() {
+    const filteredList = this.getFilteredFileListByMode(this.data.fileListMode);
+    const favoriteCount = this.data.audioList.filter(item => item.isFavorite).length;
+    const otherCount = this.data.audioList.length - favoriteCount;
+    this.setData({
+      filteredAudioList: filteredList,
+      favoriteCount: favoriteCount,
+      otherCount: otherCount
     });
   },
 });

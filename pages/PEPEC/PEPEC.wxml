@@ -1,10 +1,10 @@
 <!-- PEPEC.wxml - ICAO英语音频练习页面 -->
 <view class="page">
 
-  <!-- 顶部标题 -->
+  <!-- 顶部标题 
   <view class="header">
     <text class="header-title">ICAO英语音频练习</text>
-  </view>
+  </view>-->
 
   <!-- 主内容区 -->
   <view class="main-area">
@@ -35,25 +35,23 @@
       </view>
     </view>
 
-    <!-- 当前播放文件 -->
-    <view class="current-file-section">
+    <!-- 当前播放和进度条 -->
+    <view class="player-section">
       <text class="section-label">当前文件</text>
       <view class="current-file-name">{{currentFileName}}</view>
-    </view>
-
-    <!-- 进度条区域 -->
-    <view class="progress-section">
-      <text class="time-text">{{currentTimeText}}</text>
-      <slider
-        class="progress-slider"
-        min="0" max="100"
-        value="{{progress}}"
-        activeColor="#1890ff"
-        backgroundColor="#e8e8e8"
-        block-size="14"
-        bindchange="onProgressChange"
-      />
-      <text class="time-text">{{durationText}}</text>
+      <view class="progress-area">
+        <text class="time-text">{{currentTimeText}}</text>
+        <slider
+          class="progress-slider"
+          min="0" max="100"
+          value="{{progress}}"
+          activeColor="#1890ff"
+          backgroundColor="#e8e8e8"
+          block-size="14"
+          bindchange="onProgressChange"
+        />
+        <text class="time-text">{{durationText}}</text>
+      </view>
     </view>
 
     <!-- 播放控制按钮 -->
@@ -103,15 +101,18 @@
       </view>
     </view>
 
-    <!-- 文件列表 -->
     <view class="file-list-section">
       <view class="file-list-header">
-        <text class="section-label">文件列表 ({{audioList.length}})</text>
+        <text class="section-label" bindtap="onToggleFileListMode">
+          <text class="mode-text">{{fileListMode === 'all' ? '所有音频' : (fileListMode === 'favorite' ? '收藏夹' : '其他')}}</text>
+          <text class="mode-count">({{fileListMode === 'all' ? audioList.length : (fileListMode === 'favorite' ? favoriteCount : otherCount)}})</text>
+          <text class="arrow-icon">▼</text>
+        </text>
         <text class="clear-btn" bindtap="onClearAll" wx:if="{{audioList.length > 0}}">清空</text>
       </view>
       <scroll-view class="file-list-scroll" scroll-y>
         <view
-          wx:for="{{audioList}}"
+          wx:for="{{filteredAudioList}}"
           wx:key="index"
           class="file-item {{currentIndex === index ? 'active' : ''}} {{item.isFavorite ? 'favorite' : ''}}"
           data-index="{{index}}"
@@ -122,10 +123,38 @@
           <text class="file-favorite-icon" wx:if="{{item.isFavorite}}">⭐</text>
           <text class="file-play-icon" wx:if="{{currentIndex === index && isPlaying}}">▶</text>
         </view>
-        <view wx:if="{{audioList.length === 0}}" class="empty-hint">
-          <text>暂无文件，请点击上方按钮导入音频</text>
+        <view wx:if="{{filteredAudioList.length === 0}}" class="empty-hint">
+          <text>{{fileListMode === 'all' ? '暂无文件，请点击上方按钮导入音频' : (fileListMode === 'favorite' ? '暂无收藏音频' : '暂无其他音频')}}</text>
         </view>
       </scroll-view>
+    </view>
+
+    <view class="mode-picker-overlay {{showModePicker ? 'show' : ''}}" bindtap="onCloseModePicker">
+      <view class="mode-picker-content" catchtap="">
+        <view class="mode-picker-header">
+          <text class="mode-picker-title">选择显示模式</text>
+        </view>
+        <view class="mode-picker-options">
+          <view class="mode-picker-option {{fileListMode === 'all' ? 'active' : ''}}" bindtap="onSelectMode" data-mode="all">
+            <text class="mode-option-text">所有音频</text>
+            <text class="mode-option-count">({{audioList.length}})</text>
+            <text class="mode-option-check" wx:if="{{fileListMode === 'all'}}">✓</text>
+          </view>
+          <view class="mode-picker-option {{fileListMode === 'favorite' ? 'active' : ''}}" bindtap="onSelectMode" data-mode="favorite">
+            <text class="mode-option-text">收藏夹</text>
+            <text class="mode-option-count">({{favoriteCount}})</text>
+            <text class="mode-option-check" wx:if="{{fileListMode === 'favorite'}}">✓</text>
+          </view>
+          <view class="mode-picker-option {{fileListMode === 'other' ? 'active' : ''}}" bindtap="onSelectMode" data-mode="other">
+            <text class="mode-option-text">其他</text>
+            <text class="mode-option-count">({{otherCount}})</text>
+            <text class="mode-option-check" wx:if="{{fileListMode === 'other'}}">✓</text>
+          </view>
+        </view>
+        <view class="mode-picker-footer">
+          <text class="mode-picker-cancel" bindtap="onCloseModePicker">取消</text>
+        </view>
+      </view>
     </view>
 
     <!-- 录音模块 -->
@@ -213,7 +242,7 @@
   </view>
   -->
 
-  <!-- 教材配套资源提示弹窗 -->
+  <!-- 线上套资源提示弹窗 -->
   <view class="modal-overlay {{showInputModal ? 'show' : ''}}" bindtap="onModalTap">
     <view class="modal-content">
       <view class="modal-header">
@@ -221,7 +250,8 @@
         <text class="modal-close" bindtap="onCloseModal">✕</text>
       </view>
       <view class="modal-body">
-        <text class="modal-text">此内容为教材配套资源，请确保购买过中国民航出版社的《PEPEC中国民航飞行员英语考试900句》</text>
+        <text class="modal-text paragraph">仅获取文件列表，播放时再下载单条音频，不可离线使用。</text>
+        <text class="modal-text paragraph">对于原文文本，您可以在飞行人员信息咨询pilot.caac.gov.cn的“语言能力等级测试信息”下的“语言能力等级测试备考信息”页面找到。</text>
       </view>
       <view class="modal-footer">
         <button class="modal-btn cancel" bindtap="onCloseModal">取消</button>

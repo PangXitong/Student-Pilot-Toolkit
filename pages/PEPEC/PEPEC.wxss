@@ -137,12 +137,21 @@
   color: #1890ff;
 }
 
-/* 当前文件区域 */
-.current-file-section {
+/* 当前播放区域 */
+.player-section {
   background-color: #ffffff;
   border-radius: 12rpx;
   padding: 20rpx 24rpx;
   box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
+}
+
+.progress-area {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-top: 16rpx;
+  padding-top: 16rpx;
+  border-top: 1rpx solid #f0f0f0;
 }
 
 .section-label {
@@ -151,6 +160,139 @@
   font-weight: 500;
   display: block;
   margin-bottom: 10rpx;
+  transition: color 0.2s ease;
+}
+
+.file-list-header .section-label {
+  cursor: pointer;
+  padding: 4rpx 8rpx;
+  border-radius: 8rpx;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  white-space: nowrap;
+}
+
+.mode-text {
+  font-size: 24rpx;
+  color: #999;
+  font-weight: 500;
+}
+
+.mode-count {
+  font-size: 22rpx;
+  color: #999;
+}
+
+.file-list-header .section-label:active {
+  background-color: #f0f0f0;
+  color: #666;
+}
+
+.arrow-icon {
+  font-size: 20rpx;
+  transition: transform 0.2s ease;
+}
+
+.mode-picker-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1003;
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.mode-picker-overlay.show {
+  display: flex;
+}
+
+.mode-picker-content {
+  width: 100%;
+  max-width: 750rpx;
+  background-color: #ffffff;
+  border-radius: 32rpx 32rpx 0 0;
+  overflow: hidden;
+  box-shadow: 0 -10rpx 40rpx rgba(0, 0, 0, 0.2);
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+}
+
+.mode-picker-overlay.show .mode-picker-content {
+  transform: translateY(0);
+}
+
+.mode-picker-header {
+  padding: 30rpx;
+  text-align: center;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.mode-picker-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.mode-picker-options {
+  padding: 20rpx 0;
+}
+
+.mode-picker-option {
+  display: flex;
+  align-items: center;
+  padding: 30rpx;
+  transition: background-color 0.15s ease;
+}
+
+.mode-picker-option:active {
+  background-color: #f5f5f5;
+}
+
+.mode-picker-option.active {
+  background-color: #e6f4ff;
+}
+
+.mode-option-text {
+  flex: 1;
+  font-size: 30rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.mode-option-count {
+  font-size: 26rpx;
+  color: #999;
+  margin-right: 16rpx;
+}
+
+.mode-option-check {
+  font-size: 32rpx;
+  color: #1890ff;
+  font-weight: bold;
+}
+
+.mode-picker-footer {
+  padding: 20rpx 30rpx 40rpx;
+  border-top: 1rpx solid #f0f0f0;
+}
+
+.mode-picker-cancel {
+  width: 100%;
+  height: 88rpx;
+  font-size: 30rpx;
+  font-weight: bold;
+  border-radius: 16rpx;
+  background-color: #f5f5f5;
+  color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .current-file-name {
@@ -159,17 +301,6 @@
   font-weight: 600;
   word-break: break-all;
   line-height: 1.4;
-}
-
-/* 进度条区域 */
-.progress-section {
-  background-color: #ffffff;
-  border-radius: 12rpx;
-  padding: 20rpx 24rpx;
-  display: flex;
-  align-items: center;
-  gap: 16rpx;
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
 }
 
 .time-text {
@@ -457,6 +588,8 @@
   display: none;
   align-items: center;
   justify-content: center;
+  padding-bottom: 100rpx;
+  box-sizing: border-box;
 }
 
 .modal-overlay.show {
@@ -464,8 +597,8 @@
 }
 
 .modal-content {
-  width: 80%;
-  max-width: 500rpx;
+  width: 90%;
+  max-width: 650rpx;
   background-color: #ffffff;
   border-radius: 24rpx;
   overflow: hidden;
@@ -535,6 +668,16 @@
   color: #333;
   line-height: 1.6;
   text-align: left;
+}
+
+.modal-text.paragraph {
+  display: block;
+  text-indent: 2em;
+  margin-bottom: 16rpx;
+}
+
+.modal-text.paragraph:last-child {
+  margin-bottom: 0;
 }
 
 .modal-footer {
