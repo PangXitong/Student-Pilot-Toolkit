@@ -1,4 +1,4 @@
-<!-- PEPEC.wxml - ICAO英语音频练习页面 -->
+﻿﻿﻿<!-- PEPEC.wxml - ICAO英语音频练习页面 -->
 <view class="page">
 
   <!-- 顶部标题 
@@ -38,7 +38,7 @@
     <!-- 当前播放和进度条 -->
     <view class="player-section">
       <text class="section-label">当前文件</text>
-      <view class="current-file-name">{{currentFileName}}</view>
+      <view class="current-file-name">{{currentFileDisplayName || currentFileName}}</view>
       <view class="progress-area">
         <text class="time-text">{{currentTimeText}}</text>
         <slider
@@ -108,25 +108,40 @@
           <text class="mode-count">({{fileListMode === 'all' ? audioList.length : (fileListMode === 'favorite' ? favoriteCount : otherCount)}})</text>
           <text class="arrow-icon">▼</text>
         </text>
+        <input class="search-input" type="text" confirm-type="search" placeholder="搜索跳转" value="{{searchKeyword}}" bindinput="onSearchInput" bindconfirm="onSearchConfirm" />
+        <text class="header-btn" bindtap="onImport">导入</text>
+        <text class="header-btn" bindtap="onExport">导出</text>
         <text class="clear-btn" bindtap="onClearAll" wx:if="{{audioList.length > 0}}">清空</text>
       </view>
-      <scroll-view class="file-list-scroll" scroll-y>
+      <scroll-view class="file-list-scroll" scroll-y scroll-into-view="{{scrollIntoViewId}}" scroll-with-animation="{{true}}">
         <view
           wx:for="{{filteredAudioList}}"
-          wx:key="index"
-          class="file-item {{currentIndex === index ? 'active' : ''}} {{item.isFavorite ? 'favorite' : ''}}"
+          wx:key="name"
+          class="file-item {{currentFileName === item.name ? 'active' : ''}} {{item.isFavorite ? 'favorite' : ''}}"
+          id="file-item-{{index}}"
           data-index="{{index}}"
           bindtap="onFileItemTap"
         >
           <text class="file-index">{{index + 1}}.</text>
-          <text class="file-name">{{item.name}}</text>
+          <text class="file-name">{{item.displayName || item.name}}</text>
           <text class="file-favorite-icon" wx:if="{{item.isFavorite}}">⭐</text>
-          <text class="file-play-icon" wx:if="{{currentIndex === index && isPlaying}}">▶</text>
+          <text class="file-play-icon" wx:if="{{currentFileName === item.name && isPlaying}}">▶</text>
+          <text class="file-delete-btn" data-index="{{index}}" catchtap="onDeleteFile">×</text>
         </view>
         <view wx:if="{{filteredAudioList.length === 0}}" class="empty-hint">
           <text>{{fileListMode === 'all' ? '暂无文件，请点击上方按钮导入音频' : (fileListMode === 'favorite' ? '暂无收藏音频' : '暂无其他音频')}}</text>
         </view>
       </scroll-view>
+    </view>
+
+    <!-- 原文区域 -->
+    <view class="text-section" wx:if="{{!sentenceLoaded && audioList.length > 0}}">
+      <button class="fetch-text-btn" bindtap="onFetchText">获取原文</button>
+    </view>
+    <view class="text-section" wx:elif="{{sentenceLoaded}}">
+      <text class="section-label">原文</text>
+      <view class="text-content" wx:if="{{currentFileText}}">{{currentFileText}}</view>
+      <view class="text-placeholder" wx:else>原文已加载，播放音频后显示</view>
     </view>
 
     <view class="mode-picker-overlay {{showModePicker ? 'show' : ''}}" bindtap="onCloseModePicker">
@@ -196,7 +211,7 @@
       <scroll-view class="recording-list-scroll" scroll-y>
         <view
           wx:for="{{recordingList}}"
-          wx:key="index"
+          wx:key="name"
           class="recording-item {{currentRecordingIndex === index ? 'active' : ''}}"
           data-index="{{index}}"
           bindtap="onRecordingItemTap"

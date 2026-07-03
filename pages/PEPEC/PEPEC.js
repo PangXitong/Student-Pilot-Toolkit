@@ -17,6 +17,9 @@ Page({
     otherCount: 0,
     currentIndex: -1,
     currentFileName: '暂无文件',
+    currentFileDisplayName: '暂无文件',
+    currentFileText: '',
+    sentenceLoaded: false,
     isPlaying: false,
     progress: 0,
     currentTime: 0,
@@ -43,6 +46,8 @@ Page({
     recordingDurationText: '00:00',
     fileListMode: 'all',
     showModePicker: false,
+    searchKeyword: '',
+    scrollIntoViewId: '',
   },
 
   audioContext: null,
@@ -70,6 +75,14 @@ Page({
     this.loadAudioList();
     // 加载本地存储的录音列表
     this.loadRecordingList();
+    // 原文映射表：优先读缓存，无缓存则待用户手动获取
+    const cached = wx.getStorageSync('pepec_text_cache');
+    if (cached) {
+      this.sentenceMap = cached;
+      this.setData({ sentenceLoaded: true });
+    } else {
+      this.sentenceMap = null;
+    }
     
     this.audioContext.onEnded(() => {
       if (this.data.autoPlayNext) {
@@ -170,7 +183,8 @@ Page({
       processedCount++;
       newFiles.push({
         name: fileName,
-        audioSrc: filePath  // 使用原始临时文件路径
+        audioSrc: filePath,  // 使用原始临时文件路径
+        displayName: this._getDisplayName(fileName)
       });
 
       if (processedCount === files.length) {
@@ -231,7 +245,11 @@ Page({
     try {
       const audioList = wx.getStorageSync('PEPEC_audioList');
       if (audioList && Array.isArray(audioList)) {
-        this.setData({ audioList });
+        const updatedList = audioList.map(item => ({
+          ...item,
+          displayName: item.displayName || this._getDisplayName(item.name)
+        }));
+        this.setData({ audioList: updatedList });
         this.updateFilteredFileList();
       }
     } catch (e) {
@@ -254,6 +272,43 @@ Page({
       result += i < len ? b64chars[b3 & 63] : '=';
     }
     return result;
+  },
+
+  _getDisplayName(name) {
+    return name.replace(/^[^/]*\//, '');
+  },
+
+  _getFileText(name) {
+    const m = name.match(/\/(\d{3})\s/);
+    if (m && this.sentenceMap) {
+      // 文件名编号格式 "001" → 远程 JSON key 无前导零 "1"，需 parseInt 转换
+      const num = String(parseInt(m[1], 10));
+      return this.sentenceMap[num] || '';
+    }
+    return '';
+  },
+
+  // ---------- 远程获取原文 ----------
+  onFetchText() {
+    if (this.sentenceMap) return; // 已加载，避免重复请求
+    wx.request({
+      url: 'https://icao.oldsai.cn/text.json',
+      method: 'GET',
+      success: (res) => {
+        if (res.statusCode === 200 && res.data) {
+          this.sentenceMap = res.data;
+          wx.setStorageSync('pepec_text_cache', res.data);
+          this.setData({ sentenceLoaded: true });
+          // 如果当前正在播放，刷新原文显示
+          if (this.data.currentFileName) {
+            this.setData({ currentFileText: this._getFileText(this.data.currentFileName) });
+          }
+        }
+      },
+      fail: () => {
+        wx.showToast({ title: '加载失败，请检查网络', icon: 'none' });
+      }
+    });
   },
 
   // ---------- 播放控制 ----------
@@ -286,6 +341,8 @@ Page({
     
     this.setData({
       currentIndex: index, currentFileName: file.name,
+      currentFileDisplayName: this._getDisplayName(file.name),
+      currentFileText: this._getFileText(file.name),
       isPlaying: true, progress: 0, currentTime: 0, duration: 0,
       currentTimeText: '00:00', durationText: '00:00',
       isCurrentFavorite: file.isFavorite || false,
@@ -348,7 +405,18 @@ Page({
   },
 
   onNext() { this.playNext(); },
-  onFileItemTap(e) { this.playFileByIndex(e.currentTarget.dataset.index); },
+  onFileItemTap(e) {
+    const filteredIndex = parseInt(e.currentTarget.dataset.index);
+    const filteredList = this.data.filteredAudioList;
+    if (filteredIndex < 0 || filteredIndex >= filteredList.length) return;
+    
+    const file = filteredList[filteredIndex];
+    const realIndex = this.data.audioList.findIndex(item => item.name === file.name && item.audioSrc === file.audioSrc);
+    
+    if (realIndex >= 0) {
+      this.playFileByIndex(realIndex);
+    }
+  },
 
   // ---------- 练习模式 ----------
   onToggleMode() {
@@ -363,6 +431,112 @@ Page({
     this.audioContext.seek((e.detail.value / 100) * this.data.duration);
   },
 
+  // ---------- 删除文件 ----------
+  onDeleteFile(e) {
+    const index = e.currentTarget.dataset.index;
+    const list = this.data.audioList;
+    if (index < 0 || index >= list.length) return;
+    const file = list[index];
+    const displayName = this._getDisplayName(file.name);
+    wx.showModal({
+      title: '确认删除',
+      content: `确定要删除 "${displayName}" 吗？`,
+      success: (res) => {
+        if (!res.confirm) return;
+        // 判断是否正在播放该项
+        if (this.data.currentIndex === index) {
+          this.audioContext.stop();
+          this.setData({
+            currentIndex: -1, currentFileName: '暂无文件',
+            currentFileDisplayName: '暂无文件', currentFileText: '',
+            isPlaying: false, progress: 0, currentTime: 0, duration: 0,
+            currentTimeText: '00:00', durationText: '00:00'
+          });
+        } else if (this.data.currentIndex > index) {
+          // 删除项在播放项之前，currentIndex 需要 -1
+          this.setData({ currentIndex: this.data.currentIndex - 1 });
+        }
+        const newList = [...list];
+        newList.splice(index, 1);
+        this.setData({ audioList: newList });
+        this.updateFilteredFileList();
+        this.saveAudioList();
+      }
+    });
+  },
+
+  // ---------- 导入导出 ----------
+  onExport() {
+    if (!this.data.audioList.length) {
+      wx.showToast({ title: '列表为空，无需导出', icon: 'none' });
+      return;
+    }
+    const exportData = this.data.audioList.map(item => ({
+      name: item.name,
+      isFavorite: item.isFavorite || false
+    }));
+    const fs = wx.getFileSystemManager();
+    const filePath = `${wx.env.USER_DATA_PATH}/pepec_export.json`;
+    fs.writeFileSync(filePath, JSON.stringify(exportData, null, 2), 'utf8');
+    wx.shareFileMessage({
+      filePath,
+      fileName: 'pepec_export.json',
+      success: () => wx.showToast({ title: '已导出', icon: 'success' }),
+      fail: () => wx.showToast({ title: '分享失败，请重试', icon: 'none' })
+    });
+  },
+
+  onImport() {
+    wx.chooseMessageFile({
+      count: 1,
+      type: 'file',
+      success: (res) => {
+        const fs = wx.getFileSystemManager();
+        fs.readFile({
+          filePath: res.tempFiles[0].path,
+          encoding: 'utf8',
+          success: (readRes) => {
+            try {
+              const imported = JSON.parse(readRes.data);
+              if (!Array.isArray(imported)) {
+                wx.showToast({ title: '文件格式不正确', icon: 'none' });
+                return;
+              }
+              const nameSet = new Set(this.data.audioList.map(item => item.name));
+              let addedCount = 0;
+              let updatedCount = 0;
+              imported.forEach(entry => {
+                if (!entry.name) return;
+                if (nameSet.has(entry.name)) {
+                  const idx = this.data.audioList.findIndex(item => item.name === entry.name);
+                  if (idx >= 0) {
+                    this.data.audioList[idx].isFavorite = !!entry.isFavorite;
+                    updatedCount++;
+                  }
+                } else {
+                  this.data.audioList.push({
+                    name: entry.name,
+                    displayName: this._getDisplayName(entry.name),
+                    audioSrc: '',
+                    isFavorite: !!entry.isFavorite
+                  });
+                  addedCount++;
+                }
+              });
+              this.setData({ audioList: this.data.audioList });
+              this.updateFilteredFileList();
+              this.saveAudioList();
+              wx.showToast({ title: `新增 ${addedCount} 项，更新 ${updatedCount} 项`, icon: 'success' });
+            } catch (e) {
+              wx.showToast({ title: 'JSON 解析失败', icon: 'none' });
+            }
+          },
+          fail: () => wx.showToast({ title: '读取文件失败', icon: 'none' })
+        });
+      }
+    });
+  },
+
   // ---------- 清空 ----------
   onClearAll() {
     if (!this.data.audioList.length) return;
@@ -371,7 +545,7 @@ Page({
       success: (res) => {
         if (!res.confirm) return;
         this.audioContext.stop();
-        this.setData({ audioList: [], currentIndex: -1, currentFileName: '暂无文件', isPlaying: false, progress: 0, currentTime: 0, duration: 0, currentTimeText: '00:00', durationText: '00:00' });
+        this.setData({ audioList: [], currentIndex: -1, currentFileName: '暂无文件', currentFileDisplayName: '暂无文件', currentFileText: '', isPlaying: false, progress: 0, currentTime: 0, duration: 0, currentTimeText: '00:00', durationText: '00:00' });
         this.updateFilteredFileList();
         // 清除本地存储
         try {
@@ -485,7 +659,7 @@ Page({
             const fileUrl = `${baseUrl}/${fileName}`;
             
             // 直接使用网络 URL 播放，不下载到本地
-            newFiles.push({ name: fileName, audioSrc: fileUrl });
+            newFiles.push({ name: fileName, audioSrc: fileUrl, displayName: this._getDisplayName(fileName) });
             console.log(`添加文件: ${fileName}`);
             index++;
             
@@ -618,7 +792,7 @@ Page({
                 encoding: 'binary',
                 success: () => {
                   console.log('写入成功:', targetPath);
-                  newFiles.push({ name: fileName, audioSrc: targetPath });
+                  newFiles.push({ name: fileName, audioSrc: targetPath, displayName: this._getDisplayName(fileName) });
                   completed++;
                   checkDone();
                   resolve();
@@ -1030,5 +1204,28 @@ Page({
       favoriteCount: favoriteCount,
       otherCount: otherCount
     });
+  },
+
+  // ---------- 搜索跳转 ----------
+  onSearchInput(e) {
+    this.setData({ searchKeyword: e.detail.value });
+  },
+
+  onSearchConfirm(e) {
+    const keyword = e.detail.value.trim();
+    if (!keyword) {
+      this.setData({ scrollIntoViewId: '' });
+      return;
+    }
+
+    const list = this.data.filteredAudioList;
+    const foundIndex = list.findIndex(item => {
+      const nameWithoutExt = item.name.replace(/\.[^.]+$/, '');
+      return nameWithoutExt.includes(keyword);
+    });
+
+    if (foundIndex >= 0) {
+      this.setData({ scrollIntoViewId: 'file-item-' + foundIndex });
+    }
   },
 });
