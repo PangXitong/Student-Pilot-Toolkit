@@ -629,7 +629,7 @@ Page({
   _importOnlineFiles() {
     wx.showLoading({ title: '正在获取文件列表...' });
     
-    const baseUrl = 'https://icao.oldsai.cn';
+    const baseUrl = 'https://ot7atswad4sr.ngrok.xiaomiqiu123.top';
     const fileListUrl = `${baseUrl}/files.json`;
     const newFiles = [];
     
