@@ -1,6 +1,7 @@
 {
   "pages": [
     "pages/index/index",
+    "pages/knowledge/knowledge",
     "pages/logs/logs",
     "pages/bmi-calculator/bmi-calculator",
     "pages/bmr-calculator/bmr-calculator",

@@ -4,6 +4,7 @@ Page({
     searchValue: '',
     allTools: [
       { id: 'pepec', name: 'ICAO英语练习', image: '../images/ICAO.png', url: '../PEPEC/PEPEC', isLink: false },
+      { id: 'knowledge', name: '执照考试知识点', image: '../images/pilot.png', url: '../knowledge/knowledge', isLink: false },
       { id: 'e6b-exercise', name: '领航计算尺练习题', image: '../images/e6b.jpg', url: '../e6b-calculator/e6b-calculator', isLink: false },
       { id: 'e6b-calculator', name: 'E6B领航计算器', image: '../images/e6b.jpg', url: '../e6b-flight-computer/e6b-flight-computer', isLink: false },
       { id: 'e6b-link', name: 'E6B领航计算尺链接', image: '../images/e6b.jpg', url: 'https://mediafiles.aero.und.edu/aero.und.edu/aviation/trainers/e6b/', isLink: true },
@@ -32,7 +33,16 @@ Page({
   initTools() {
     const allTools = this.data.allTools;
     this.setData({
-      theoryTools: allTools.filter(t => ['pepec', 'e6b-exercise', 'e6b-calculator', 'e6b-link'].includes(t.id)),
+      theoryTools: (() => {
+        const tools = allTools.filter(t => ['knowledge', 'pepec', 'e6b-exercise', 'e6b-calculator', 'e6b-link'].includes(t.id));
+        // knowledge 排第一位，pepec 排第二位
+        const kIdx = tools.findIndex(t => t.id === 'knowledge');
+        if (kIdx > 0) {
+          const [item] = tools.splice(kIdx, 1);
+          tools.unshift(item);
+        }
+        return tools;
+      })(),
       schoolTools: allTools.filter(t => ['flight-student', 'camera-watermark', 'flight-teacher'].includes(t.id)),
       utilityTools: allTools.filter(t => ['bmi', 'bmr', 'heart-rate'].includes(t.id)),
       calculatorTools: allTools.filter(t => ['unit-converter', 'time-calculator', 'download-calculator', 'random-number'].includes(t.id)),
