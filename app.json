@@ -1,7 +1,6 @@
 {
   "pages": [
     "pages/index/index",
-    "pages/knowledge/knowledge",
     "pages/logs/logs",
     "pages/bmi-calculator/bmi-calculator",
     "pages/bmr-calculator/bmr-calculator",
@@ -12,7 +11,6 @@
     "pages/e6b-calculator/e6b-calculator",
     "pages/e6b-flight-computer/e6b-flight-computer",
     "pages/time-calculator/time-calculator",
-    "pages/webview/webview",
     "pages/random-number/random-number",
     "pages/PEPEC/PEPEC",
     "pages/flight-time-calculator/flight-time-calculator",

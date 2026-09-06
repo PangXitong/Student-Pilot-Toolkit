@@ -292,7 +292,7 @@ Page({
   onFetchText() {
     if (this.sentenceMap) return; // 已加载，避免重复请求
     wx.request({
-      url: 'https://icao.oldsai.cn/text.json',
+      url: 'https://ot7atswad4sr.ngrok.xiaomiqiu123.top/text.json',
       method: 'GET',
       success: (res) => {
         if (res.statusCode === 200 && res.data) {
