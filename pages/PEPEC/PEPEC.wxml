@@ -1,4 +1,4 @@
-﻿﻿﻿<!-- PEPEC.wxml - ICAO英语音频练习页面 -->
+﻿﻿<!-- PEPEC.wxml - ICAO英语音频练习页面 -->
 <view class="page">
 
   <!-- 顶部标题 
@@ -269,8 +269,8 @@
         <text class="modal-text paragraph">对于原文文本，您可以在飞行人员信息咨询pilot.caac.gov.cn的“语言能力等级测试信息”下的“语言能力等级测试备考信息”页面找到。</text>
       </view>
       <view class="modal-footer">
-        <button class="modal-btn cancel" bindtap="onCloseModal">取消</button>
-        <button class="modal-btn confirm" bindtap="onConfirmImport">确认</button>
+        <button class="modal-btn cancel" bindtap="onConfirmImport">CAAC原版</button>
+        <button class="modal-btn confirm" bindtap="onConfirmImportSorted">排序版</button>
       </view>
     </view>
   </view>

@@ -620,10 +620,113 @@ Page({
     //   wx.showToast({ title: '学号无效', icon: 'none' });
     //   return;
     // }
-    
+
     this.onCloseModal();
-    // 开始导入
+    // 开始导入CAAC原版
     this._importOnlineFiles();
+  },
+
+  onConfirmImportSorted() {
+    this.onCloseModal();
+    // 开始导入排序版
+    this._importOnlineFilesSorted();
+  },
+
+  // 导入排序版：获取 /排序版.json，按JSON中的顺序和displayName替换列表
+  _importOnlineFilesSorted() {
+    wx.showLoading({ title: '正在获取排序版文件列表...' });
+
+    const baseUrl = 'https://ot7atswad4sr.ngrok.xiaomiqiu123.top';
+    const fileListUrl = `${baseUrl}/排序版.json`;
+
+    wx.request({
+      url: fileListUrl,
+      success: (res) => {
+        if (res.statusCode === 200 && res.data && res.data.files) {
+          const files = res.data.files;
+          console.log('获取排序版文件列表成功，共', files.length, '个文件');
+
+          // 保留已有文件的 audioSrc 和收藏标记（同一文件只是顺序/显示名不同）
+          const existingMap = {};
+          this.data.audioList.forEach(item => {
+            existingMap[item.name] = item;
+          });
+
+          const newFiles = [];
+          for (let i = 0; i < files.length; i++) {
+            const entry = files[i];
+            // 支持字符串数组或对象数组两种格式
+            let fileName, displayName;
+            if (typeof entry === 'string') {
+              fileName = entry;
+              displayName = String(i + 1).padStart(3, '0');
+            } else {
+              fileName = entry.name;
+              displayName = entry.displayName || String(i + 1).padStart(3, '0');
+            }
+
+            const existing = existingMap[fileName];
+            if (existing) {
+              // 已有文件：保留本地 audioSrc 和收藏状态，仅更新显示名
+              newFiles.push({
+                name: fileName,
+                audioSrc: existing.audioSrc,
+                displayName: displayName,
+                isFavorite: existing.isFavorite || false
+              });
+            } else {
+              // 新文件：使用网络URL
+              const fileUrl = `${baseUrl}/${fileName}`;
+              newFiles.push({ name: fileName, audioSrc: fileUrl, displayName: displayName });
+            }
+          }
+
+          wx.hideLoading();
+          if (newFiles.length === 0) {
+            wx.showToast({ title: '未获取到任何文件', icon: 'none' });
+            return;
+          }
+
+          // 尝试保留当前播放位置
+          const currentFileName = this.data.currentFileName;
+          let newData = { audioList: newFiles };
+
+          if (currentFileName !== '暂无文件') {
+            const newIndex = newFiles.findIndex(f => f.name === currentFileName);
+            if (newIndex >= 0) {
+              newData.currentIndex = newIndex;
+              newData.currentFileDisplayName = newFiles[newIndex].displayName;
+            } else {
+              try { this.audioContext.stop(); } catch (e) {}
+              newData.currentIndex = -1;
+              newData.currentFileName = '暂无文件';
+              newData.currentFileDisplayName = '暂无文件';
+              newData.currentFileText = '';
+              newData.isPlaying = false;
+              newData.progress = 0;
+            }
+          }
+
+          this.setData(newData);
+          this.updateFilteredFileList();
+          wx.showToast({ title: `导入成功，共${newFiles.length}个文件`, icon: 'success' });
+
+          if (this.data.currentIndex === -1 && newFiles.length > 0) {
+            this.playFileByIndex(0);
+          }
+
+          this.saveAudioList();
+        } else {
+          wx.hideLoading();
+          wx.showToast({ title: '获取排序版文件列表失败', icon: 'none' });
+        }
+      },
+      fail: (err) => {
+        wx.hideLoading();
+        console.error('获取排序版文件列表失败', err);
+        wx.showToast({ title: '获取排序版文件列表失败', icon: 'none' });
+      },
+    });
   },
 
   _importOnlineFiles() {
