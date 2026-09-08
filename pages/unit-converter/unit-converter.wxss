@@ -24,10 +24,10 @@ page {
 
 /* 标题样式 */
 .title {
-  font-size: 48rpx;
+  font-size: 60rpx;
   font-weight: bold;
   color: #1890ff;
-  margin: 20rpx 0;
+  margin: 0rpx 0;
 }
 
 /* 单位输入区域 */

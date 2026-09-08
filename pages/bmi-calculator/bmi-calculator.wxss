@@ -7,7 +7,7 @@ page {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  padding: 40rpx 20rpx;
+  padding: 20rpx 20rpx;
   box-sizing: border-box;
 }
 
@@ -18,7 +18,7 @@ page {
 }
 
 .title {
-  font-size: 40rpx;
+  font-size: 60rpx;
   font-weight: bold;
   color: #1890ff;
   text-align: center;
