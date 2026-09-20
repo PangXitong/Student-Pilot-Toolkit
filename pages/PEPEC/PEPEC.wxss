@@ -1043,7 +1043,8 @@
   font-size: 28rpx;
   line-height: 44rpx;
   color: #333;
-  word-break: break-all;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .text-placeholder {

@@ -316,19 +316,25 @@ Page({
     const list = this.data.audioList;
     if (index < 0 || index >= list.length) return;
     const file = list[index];
-    
+
     console.log('准备播放文件:', file.name, '路径:', file.audioSrc);
-    
+
     // 先停止当前播放
     try {
       this.audioContext.stop();
     } catch (e) {
       console.log('停止音频失败:', e);
     }
-    
+
     // 设置新的音频源
     this.audioContext.src = file.audioSrc;
-    
+
+    // 计算过滤列表中的索引，用于自动滚动
+    const filteredList = this.data.filteredAudioList;
+    const filteredIndex = filteredList.findIndex(
+      (item) => item.name === file.name && item.audioSrc === file.audioSrc
+    );
+
     // 延迟一点再播放，确保iOS能正确加载
     setTimeout(() => {
       console.log('开始播放...');
@@ -338,15 +344,31 @@ Page({
         console.error('播放音频失败:', e);
       }
     }, 100);
-    
-    this.setData({
-      currentIndex: index, currentFileName: file.name,
-      currentFileDisplayName: this._getDisplayName(file.name),
-      currentFileText: this._getFileText(file.name),
-      isPlaying: true, progress: 0, currentTime: 0, duration: 0,
-      currentTimeText: '00:00', durationText: '00:00',
-      isCurrentFavorite: file.isFavorite || false,
-    });
+
+    // 计算过滤列表中的索引，用于判断是否需要自动滚动
+    // 只有当播放项不在可视区域（索引较大）时才滚动
+    const visibleThreshold = 5; // 可视区域前几个不触发滚动
+
+    this.setData(
+      {
+        currentIndex: index,
+        currentFileName: file.name,
+        currentFileDisplayName: this._getDisplayName(file.name),
+        currentFileText: this._getFileText(file.name),
+        isPlaying: true,
+        progress: 0,
+        currentTime: 0,
+        duration: 0,
+        currentTimeText: '00:00',
+        durationText: '00:00',
+        isCurrentFavorite: file.isFavorite || false,
+        // 只有当播放项不在可视区域前几个时，才自动滚动到它
+        scrollIntoViewId:
+          filteredIndex >= 0 && filteredIndex > visibleThreshold
+            ? 'file-item-' + filteredIndex
+            : '',
+      }
+    );
   },
 
   // ---------- 收藏功能 ----------
