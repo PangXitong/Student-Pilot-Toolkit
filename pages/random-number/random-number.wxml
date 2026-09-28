@@ -64,6 +64,11 @@
           <view class="history-empty-text">暂无历史记录</view>
         </view>
       </view>
+
+      <!-- 广告（会员隐藏） -->
+      <view class="ad-wrapper" style="width: 100%;margin-top: 20rpx;" wx:if="{{!isMember}}">
+        <ad-custom unit-id="adunit-2d6a3185151841c7" bindload="adLoad" binderror="adError" bindclose="adClose"></ad-custom>
+      </view>
     </view>
 
     <!-- ② 是 / 否 决策器 -->

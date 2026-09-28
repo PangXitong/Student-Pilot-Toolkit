@@ -2,6 +2,9 @@ Page({
   data: {
     activeTab: 0,
     searchValue: '',
+    isMember: false,
+    memberExpireTime: '',
+    videoAd: null,
     allTools: [
       { id: 'pepec', name: 'ICAO英语练习', image: '../images/ICAO.png', url: '../PEPEC/PEPEC', isLink: false },
       { id: 'e6b-exercise', name: '领航计算尺练习题', image: '../images/e6b.jpg', url: '../e6b-calculator/e6b-calculator', isLink: false },
@@ -25,8 +28,41 @@ Page({
     calculatorTools: []
   },
 
+  onShow() {
+    // 每次显示页面时检查会员状态
+    this.checkMemberStatus();
+  },
+
   onLoad() {
     this.initTools();
+    this.initRewardedVideoAd();
+  },
+
+  initRewardedVideoAd() {
+    if (wx.createRewardedVideoAd) {
+      const videoAd = wx.createRewardedVideoAd({
+        adUnitId: 'adunit-5e0ea5074305200f'
+      });
+      videoAd.onLoad(() => {
+        console.log('激励视频广告加载成功');
+      });
+      videoAd.onError((err) => {
+        console.error('激励视频广告加载失败', err);
+      });
+      videoAd.onClose((res) => {
+        // 用户点击了【关闭广告】按钮
+        if (res && res.isEnded) {
+          // 正常播放结束，发放奖励
+          this.grantMembership();
+        } else {
+          wx.showToast({
+            title: '请看完广告才能获得会员',
+            icon: 'none'
+          });
+        }
+      });
+      this.setData({ videoAd: videoAd });
+    }
   },
 
   initTools() {
@@ -37,6 +73,80 @@ Page({
       utilityTools: allTools.filter(t => ['bmi', 'bmr', 'heart-rate'].includes(t.id)),
       calculatorTools: allTools.filter(t => ['unit-converter', 'time-calculator', 'download-calculator', 'random-number'].includes(t.id)),
       filteredTools: allTools
+    });
+    this.checkMemberStatus();
+  },
+
+  checkMemberStatus() {
+    try {
+      const expireTime = wx.getStorageSync('memberExpireTime');
+      const app = getApp();
+      if (expireTime && Date.now() < parseInt(expireTime)) {
+        app.globalData.isMember = true;
+        app.globalData.memberExpireTime = parseInt(expireTime);
+        const expireDate = new Date(parseInt(expireTime));
+        const formattedTime = `${expireDate.getFullYear()}-${String(expireDate.getMonth() + 1).padStart(2, '0')}-${String(expireDate.getDate()).padStart(2, '0')} ${String(expireDate.getHours()).padStart(2, '0')}:${String(expireDate.getMinutes()).padStart(2, '0')}`;
+        this.setData({
+          isMember: true,
+          memberExpireTime: formattedTime
+        });
+      } else {
+        app.globalData.isMember = false;
+        app.globalData.memberExpireTime = 0;
+        this.setData({
+          isMember: false,
+          memberExpireTime: ''
+        });
+      }
+    } catch (e) {
+      console.error('获取会员信息失败', e);
+    }
+  },
+
+  grantMembership() {
+    const app = getApp();
+    const expireTime = app.extendMembership();
+    
+    if (!expireTime) {
+      wx.showToast({ title: '操作失败', icon: 'none' });
+      return;
+    }
+    
+    const expireDate = new Date(expireTime);
+    const formattedTime = `${expireDate.getFullYear()}-${String(expireDate.getMonth() + 1).padStart(2, '0')}-${String(expireDate.getDate()).padStart(2, '0')} ${String(expireDate.getHours()).padStart(2, '0')}:${String(expireDate.getMinutes()).padStart(2, '0')}`;
+    
+    this.setData({
+      isMember: true,
+      memberExpireTime: formattedTime
+    });
+
+    wx.showToast({
+      title: '会员延长3天！',
+      icon: 'success'
+    });
+  },
+
+  watchAdForMembership() {
+    const videoAd = this.data.videoAd;
+    if (!videoAd) {
+      wx.showToast({
+        title: '广告功能暂不可用',
+        icon: 'none'
+      });
+      return;
+    }
+
+    // 显示激励视频广告
+    videoAd.show().catch(() => {
+      videoAd.load()
+        .then(() => videoAd.show())
+        .catch(err => {
+          console.error('激励视频广告显示失败', err);
+          wx.showToast({
+            title: '广告加载失败，请稍后再试',
+            icon: 'none'
+          });
+        });
     });
   },
 

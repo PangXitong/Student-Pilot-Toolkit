@@ -16,7 +16,8 @@ Page({
     utcTimeResult: '',
     longitude: '',
     utcOffsetFromLongitude: '',
-    timezoneFromLongitude: ''
+    timezoneFromLongitude: '',
+    isMember: false // 会员状态
   },
 
   /**
@@ -26,6 +27,7 @@ Page({
     this.initTimezones();
     this.updateCurrentUTC();
     this.initDateTime();
+    this.checkMemberStatus();
   },
 
   /**
@@ -33,6 +35,20 @@ Page({
    */
   onShow: function () {
     this.updateCurrentUTC();
+    this.checkMemberStatus();
+  },
+
+  checkMemberStatus() {
+    try {
+      const expireTime = wx.getStorageSync('memberExpireTime');
+      if (expireTime && Date.now() < parseInt(expireTime)) {
+        this.setData({ isMember: true });
+      } else {
+        this.setData({ isMember: false });
+      }
+    } catch (e) {
+      console.error('获取会员状态失败', e);
+    }
   },
 
   /**
@@ -214,6 +230,17 @@ Page({
       utcOffsetFromLongitude: offsetString,
       timezoneFromLongitude: timezoneString
     });
+  },
+
+  // 原生模板广告事件处理
+  adLoad() {
+    console.log('原生模板广告加载成功')
+  },
+  adError(err) {
+    console.error('原生模板广告加载失败', err)
+  },
+  adClose() {
+    console.log('原生模板广告关闭')
   },
 
   // 分享给朋友

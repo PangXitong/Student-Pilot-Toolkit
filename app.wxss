@@ -7,4 +7,10 @@
   justify-content: space-between;
   padding: 200rpx 0;
   box-sizing: border-box;
+}
+
+/* 会员有效期内隐藏所有广告 */
+page .member-active .tab2-ad-wrapper,
+page .member-active ad-custom {
+  display: none !important;
 } 

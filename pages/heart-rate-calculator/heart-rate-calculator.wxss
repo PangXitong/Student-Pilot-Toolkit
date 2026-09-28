@@ -383,3 +383,9 @@ page {
   color: #ff4d4f;
   font-weight: 700;
 }
+
+.ad-wrapper {
+  width: 100%;
+  margin-top: 40rpx;
+  margin-bottom: 40rpx;
+}

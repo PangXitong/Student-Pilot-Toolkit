@@ -1,4 +1,4 @@
-﻿﻿﻿﻿<!-- PEPEC.wxml - ICAO英语音频练习页面 -->
+<!-- PEPEC.wxml - ICAO英语音频练习页面 -->
 <view class="page">
 
   <!-- 顶部标题 
@@ -9,22 +9,9 @@
   <!-- 主内容区 -->
   <view class="main-area">
 
-    <!-- 导入提示 -->
-    <view class="import-tip">
-      <text class="tip-text">确保手机关闭静音模式，报错需要清理缓存</text>
-    </view>
-
-    <!-- 导入按钮 -->
-    <view class="import-section">
-      <view class="import-buttons">
-        <button class="import-btn primary" bindtap="onChooseFromChat">📁 导入MP3文件</button>
-        <button class="import-btn primary" bindtap="onChooseZipFile">📦 导入ZIP文件</button>
-        <button class="import-btn primary" bindtap="onImportOnline">🌐 使用线上资源</button>
-      </view>
-    </view>
-
-    <!-- 练习模式选择 -->
-    <view class="mode-section">
+    <!-- 顶部操作区：导入 / 练习模式切换 / 自动连播开关 -->
+    <view class="top-section">
+      <view class="import-btn primary" bindtap="onOpenImportModal">📁 导入</view>
       <view class="mode-card {{playMode === 'sequence' ? 'active' : ''}}" bindtap="onToggleMode">
         <text class="mode-icon">🔁</text>
         <text class="mode-text">{{playModeText}}</text>
@@ -134,6 +121,11 @@
       </scroll-view>
     </view>
 
+    <!-- 广告（会员隐藏） -->
+    <view class="ad-wrapper" style="width: 100%;margin-top: 20rpx;" wx:if="{{!isMember}}">
+      <ad-custom unit-id="adunit-2d6a3185151841c7" bindload="adLoad" binderror="adError" bindclose="adClose"></ad-custom>
+    </view>
+
     <!-- 原文区域 -->
     <view class="text-section" wx:if="{{!sentenceLoaded && audioList.length > 0}}">
       <button class="fetch-text-btn" bindtap="onFetchText">获取原文</button>
@@ -172,6 +164,11 @@
       </view>
     </view>
 
+    <!-- 提示 -->
+    <view class="import-tip">
+      <text class="tip-text">确保手机关闭静音模式，报错需要清理缓存</text>
+    </view>
+    
     <!-- 录音模块 -->
     <view class="recording-section">
       <view class="recording-header">
@@ -257,16 +254,23 @@
   </view>
   -->
 
-  <!-- 线上套资源提示弹窗 -->
+  <!-- 导入弹窗 -->
   <view class="modal-overlay {{showInputModal ? 'show' : ''}}" bindtap="onModalTap">
-    <view class="modal-content">
+    <view class="modal-content" catchtap="stopPropagation">
       <view class="modal-header">
-        <text class="modal-title">提示</text>
+        <text class="modal-title">导入</text>
         <text class="modal-close" bindtap="onCloseModal">✕</text>
       </view>
-      <view class="modal-body">
-        <text class="modal-text paragraph">仅获取文件列表，播放时再下载单条音频，不可离线使用。</text>
-        <text class="modal-text paragraph">对于原文文本，您可以在飞行人员信息咨询pilot.caac.gov.cn的“语言能力等级测试信息”下的“语言能力等级测试备考信息”页面找到。</text>
+      <view class="modal-body import-body">
+        <text class="modal-text local-tip">使用本地资源</text>
+        <view class="import-choice-row">
+          <view class="import-choice-btn" bindtap="onChooseFromChat">📁 导入MP3文件</view>
+          <view class="import-choice-btn" bindtap="onChooseZipFile">📦 导入ZIP文件</view>
+        </view>
+        <view class="online-block">
+          <text class="online-title">使用线上资源</text>
+          <text class="online-desc">获取文件列表，播放时下载单条音频，不可离线使用</text>
+        </view>
       </view>
       <view class="modal-footer">
         <button class="modal-btn cancel" bindtap="onConfirmImport">CAAC原版</button>

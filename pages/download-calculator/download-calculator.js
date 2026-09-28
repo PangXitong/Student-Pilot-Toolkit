@@ -13,7 +13,12 @@ Page({
     seconds: '',
     fileSizeUnits: ['KB', 'MB', 'GB', 'TB', 'KiB', 'MiB', 'GiB', 'TiB'],
     speedUnits: ['KB/s', 'MB/s', 'Mbps'],
-    result: ''
+    result: '',
+    isMember: false // 会员状态
+  },
+
+  onShow() {
+    this.checkMemberStatus();
   },
 
   onLoad: function (options) {
@@ -21,6 +26,20 @@ Page({
       fileSizeUnitIndex: 1,
       downloadSpeedUnitIndex: 1
     });
+    this.checkMemberStatus();
+  },
+
+  checkMemberStatus() {
+    try {
+      const expireTime = wx.getStorageSync('memberExpireTime');
+      if (expireTime && Date.now() < parseInt(expireTime)) {
+        this.setData({ isMember: true });
+      } else {
+        this.setData({ isMember: false });
+      }
+    } catch (e) {
+      console.error('获取会员状态失败', e);
+    }
   },
 
   onFileSizeInput: function (e) {
@@ -185,6 +204,17 @@ Page({
       const totalSeconds = fileSizeBytes / speedBytesPerSec;
       this.setData({ result: '下载时间: ' + this.formatTime(totalSeconds) });
     }
+  },
+
+  // 原生模板广告事件处理
+  adLoad() {
+    console.log('原生模板广告加载成功')
+  },
+  adError(err) {
+    console.error('原生模板广告加载失败', err)
+  },
+  adClose() {
+    console.log('原生模板广告关闭')
   },
 
   onShareAppMessage() {

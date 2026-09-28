@@ -51,13 +51,32 @@ Page({
       windSpeed: '',
       safeReturnDistance: '',
       safeFlightTime: ''
-    }
+    },
+    isMember: false // 会员状态
+  },
+
+  onShow() {
+    this.checkMemberStatus();
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
+    this.checkMemberStatus();
+  },
+
+  checkMemberStatus() {
+    try {
+      const expireTime = wx.getStorageSync('memberExpireTime');
+      if (expireTime && Date.now() < parseInt(expireTime)) {
+        this.setData({ isMember: true });
+      } else {
+        this.setData({ isMember: false });
+      }
+    } catch (e) {
+      console.error('获取会员状态失败', e);
+    }
   },
 
   /**
@@ -548,6 +567,17 @@ Page({
         safeFlightTime: safeFlightTime.toFixed(2)
       }
     });
+  },
+
+  // 原生模板广告事件处理
+  adLoad() {
+    console.log('原生模板广告加载成功')
+  },
+  adError(err) {
+    console.error('原生模板广告加载失败', err)
+  },
+  adClose() {
+    console.log('原生模板广告关闭')
   },
 
   // 分享给朋友

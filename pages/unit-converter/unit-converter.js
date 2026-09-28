@@ -190,9 +190,31 @@ Page({
       { unit: 'tonUK', name: '长吨', symbol: 'ton (UK)', value: '' },
       { unit: 'tonUS', name: '短吨', symbol: 'ton (US)', value: '' },
       { unit: 'slug', name: '斯勒格', symbol: 'slug', value: '' }
-    ]
+    ],
+    isMember: false // 会员状态
   },
-  
+
+  onShow() {
+    this.checkMemberStatus();
+  },
+
+  onLoad() {
+    this.checkMemberStatus();
+  },
+
+  checkMemberStatus() {
+    try {
+      const expireTime = wx.getStorageSync('memberExpireTime');
+      if (expireTime && Date.now() < parseInt(expireTime)) {
+        this.setData({ isMember: true });
+      } else {
+        this.setData({ isMember: false });
+      }
+    } catch (e) {
+      console.error('获取会员状态失败', e);
+    }
+  },
+
   /**
    * 切换分类
    */

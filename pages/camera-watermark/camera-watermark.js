@@ -22,6 +22,28 @@ Page({
       remark: '',
       dorm: '',
       question: ''
+    },
+    isMember: false // 会员状态
+  },
+
+  onShow() {
+    this.checkMemberStatus();
+  },
+
+  onLoad() {
+    this.checkMemberStatus();
+  },
+
+  checkMemberStatus() {
+    try {
+      const expireTime = wx.getStorageSync('memberExpireTime');
+      if (expireTime && Date.now() < parseInt(expireTime)) {
+        this.setData({ isMember: true });
+      } else {
+        this.setData({ isMember: false });
+      }
+    } catch (e) {
+      console.error('获取会员状态失败', e);
     }
   },
 

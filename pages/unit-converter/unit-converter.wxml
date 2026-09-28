@@ -20,7 +20,7 @@
             <view class="unit-symbol">{{item.symbol}}</view>
           </view>
         </view>
-        <view class="ad-wrapper">
+        <view class="ad-wrapper" wx:if="{{!isMember}}">
           <ad-custom unit-id="adunit-bd819a878ccd8387" bindload="adLoad" binderror="adError" bindclose="adClose"></ad-custom>
         </view>
       </view>

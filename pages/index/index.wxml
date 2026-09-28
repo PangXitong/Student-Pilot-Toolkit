@@ -1,4 +1,4 @@
-<view class="page-container">
+<view class="page-container {{isMember ? 'member-active' : ''}}">
   <scroll-view class="content-area" scroll-y>
     <!-- Tab1: 工具主页 -->
     <view class="tab-content {{activeTab === 0 ? 'active' : ''}}">
@@ -83,32 +83,42 @@
       </view>
     </view>
 
-    <!-- Tab2: 常用链接 -->
+    <!-- Tab2: 会员中心 -->
     <view class="tab-content {{activeTab === 1 ? 'active' : ''}}">
       <view class="content-inner">
-        <view class="page-title">常用链接</view>
-        
-        <view class="links-grid">
-          <view class="link-item" bindtap="openLink" data-url="https://pilot.caac.gov.cn/">
-            <image class="link-image" src="../images/pilot.jpg" mode="aspectFill" />
-            <view class="link-text">飞行人员信息查询</view>
-          </view>
-          <view class="link-item" bindtap="openLink" data-url="https://ams.caac.gov.cn/">
-            <image class="link-image" src="../images/ams.jpg" mode="aspectFill" />
-            <view class="link-text">体检合格证管理系统</view>
-          </view>
-          <view class="link-item" bindtap="openLink" data-url="https://apps.csair.com/">
-            <image class="link-image" src="../images/csn.jpg" mode="aspectFill" />
-            <view class="link-text">南航应用商店</view>
-          </view>
-          <view class="link-item" bindtap="openLink" data-url="https://b2e.csair.com/">
-            <image class="link-image" src="../images/csn.jpg" mode="aspectFill" />
-            <view class="link-text">南航员工旅行</view>
+        <view class="page-title member-title">会员</view>
+
+        <!-- 会员状态显示 -->
+        <view class="member-expire-section">
+          <view class="expire-main-text">
+            <text wx:if="{{isMember}}">会员到期时间：{{memberExpireTime}}</text>
+            <text wx:else>暂未获得会员</text>
           </view>
         </view>
-      </view>
-      <view class="tab2-ad-wrapper">
-        <ad-custom unit-id="adunit-bd819a878ccd8387" bindload="adLoad" binderror="adError" bindclose="adClose"></ad-custom>
+
+        <!-- 观看广告按钮 -->
+        <view class="watch-ad-btn" bindtap="watchAdForMembership">
+          <view class="btn-text">
+            <text wx:if="{{isMember}}">观看广告延长会员3天</text>
+            <text wx:else>观看广告免费获取3天会员</text>
+          </view>
+        </view>
+
+        <!-- 会员权益 -->
+        <view class="member-benefits-gold">
+          <view class="benefits-title">会员权益</view>
+          <view class="benefit-item">
+            <view class="benefit-check">✓</view>
+            <view class="benefit-text">免除所有广告</view>
+          </view>
+          <view class="benefit-item">
+            <view class="benefit-check">✓</view>
+            <view class="benefit-text">更多权益敬请期待</view>
+          </view>
+        </view>
+
+        <!-- 备注 -->
+        <view class="member-note-text">会员信息仅存储在本地，清理缓存会导致会员信息丢失</view>
       </view>
     </view>
 
@@ -151,11 +161,11 @@
   <view class="tab-bar">
     <view class="tab-item {{activeTab === 0 ? 'active' : ''}}" data-index="0" bindtap="switchTab">
       <view class="tab-icon">🏠</view>
-      <view class="tab-label">工具</view>
+      <view class="tab-label">首页</view>
     </view>
     <view class="tab-item {{activeTab === 1 ? 'active' : ''}}" data-index="1" bindtap="switchTab">
-      <view class="tab-icon">🔗</view>
-      <view class="tab-label">链接</view>
+      <view class="tab-icon">💎</view>
+      <view class="tab-label">会员</view>
     </view>
     <view class="tab-item {{activeTab === 2 ? 'active' : ''}}" data-index="2" bindtap="switchTab">
       <view class="tab-icon">👤</view>

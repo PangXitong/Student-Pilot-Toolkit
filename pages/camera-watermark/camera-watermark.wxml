@@ -93,8 +93,8 @@
       <button class="save-button" bindtap="saveToAlbum">保存照片</button>
     </view>
 
-    <!-- 广告 -->
-    <view class="ad-wrap">
+    <!-- 广告（会员隐藏） -->
+    <view class="ad-wrap" wx:if="{{!isMember}}">
       <ad-custom unit-id="adunit-2d6a3185151841c7" bindload="adLoad" binderror="adError" bindclose="adClose"></ad-custom>
     </view>
 

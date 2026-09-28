@@ -77,6 +77,11 @@
       </view>
     </view>
     
+    <!-- 广告（会员隐藏） -->
+    <view class="ad-wrapper" style="width: 100%;margin-top: 20rpx;" wx:if="{{!isMember}}">
+      <ad-custom unit-id="adunit-2d6a3185151841c7" bindload="adLoad" binderror="adError" bindclose="adClose"></ad-custom>
+    </view>
+    
     <!-- 飞行计划部分 -->
     <view class="stats-section">
       <view class="section-title">飞行计划</view>
@@ -190,6 +195,8 @@
         <text>　　本工具仅在本地运行和存储，清除缓存历史记录将消失。</text>
         <text>{{'\n'}}</text>
         <text>　　</text><text class="important-warning">重要提醒：</text><text>本工具仅作为辅助计算参考，最终训练安排请以民航法规和航校要求为准！</text>
+        <text>{{'\n'}}</text>
+        <text>　　由于浮点数精度问题，计算结果可能会存在±1分钟的<text class="important-warning">误差</text>！</text>
       </view>
     </view>
     

@@ -70,5 +70,10 @@
       <text class="formula-content"><text class="important-warning">重要提示：</text>此计算结果仅作为训练建议，不作为医学参考。</text>
       <text class="formula-note">注：使用 Tanaka 公式(208 - 0.7×年龄)作为备用公式</text>
     </view>
+
+    <!-- 广告（会员隐藏） -->
+    <view class="ad-wrapper" style="width: 100%;margin-top: 20rpx;" wx:if="{{!isMember}}">
+      <ad-custom unit-id="adunit-bd819a878ccd8387" bindload="adLoad" binderror="adError" bindclose="adClose"></ad-custom>
+    </view>
   </view>
 </view>

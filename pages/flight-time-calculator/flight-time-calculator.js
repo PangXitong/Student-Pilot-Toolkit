@@ -28,7 +28,12 @@ Page({
     totalHours168: 0,
     nextAvailableTime: '随时可飞！',
     remainingTime: 0,
-    totalHours: 0
+    totalHours: 0,
+    isMember: false // 会员状态
+  },
+
+  onShow() {
+    this.checkMemberStatus();
   },
 
   onLoad() {
@@ -37,6 +42,20 @@ Page({
     this.updateStats();
     this.calculateRemainingTime();
     this.initDurationOptions();
+    this.checkMemberStatus();
+  },
+
+  checkMemberStatus() {
+    try {
+      const expireTime = wx.getStorageSync('memberExpireTime');
+      if (expireTime && Date.now() < parseInt(expireTime)) {
+        this.setData({ isMember: true });
+      } else {
+        this.setData({ isMember: false });
+      }
+    } catch (e) {
+      console.error('获取会员状态失败', e);
+    }
   },
 
   // 获取7个日历日的开始时间（包含今天）
@@ -691,6 +710,17 @@ Page({
       return `${h}时`;
     }
     return `${h}时${m}分`;
+  },
+
+  // 原生模板广告事件处理
+  adLoad() {
+    console.log('原生模板广告加载成功')
+  },
+  adError(err) {
+    console.error('原生模板广告加载失败', err)
+  },
+  adClose() {
+    console.log('原生模板广告关闭')
   },
 
   // 分享给朋友

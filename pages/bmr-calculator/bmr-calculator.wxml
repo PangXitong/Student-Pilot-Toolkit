@@ -37,6 +37,11 @@
       <text class="result-value">{{bmrValue}} kcal/天</text>
       <text class="result-description">{{bmrDescription}}</text>
     </view>
+
+    <!-- 广告（会员隐藏） -->
+    <view class="ad-wrapper" style="width: 100%;margin-top: 20rpx;" wx:if="{{!isMember}}">
+      <ad-custom unit-id="adunit-bd819a878ccd8387" bindload="adLoad" binderror="adError" bindclose="adClose"></ad-custom>
+    </view>
     
     <button class="back-button" bindtap="goBack">返回首页</button>
     

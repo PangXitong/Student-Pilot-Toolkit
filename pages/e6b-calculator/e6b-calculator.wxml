@@ -31,6 +31,11 @@
       </view>
     </view>
     
+    <!-- 广告（会员隐藏） -->
+    <view class="ad-wrapper" style="width: 100%;" wx:if="{{!isMember}}">
+      <ad-custom unit-id="adunit-91990ebf57dc923d" bindload="adLoad" binderror="adError" bindclose="adClose"></ad-custom>
+    </view>
+
     <!-- 底部间距 -->
     <view class="bottom-spacing"></view>
   </view>

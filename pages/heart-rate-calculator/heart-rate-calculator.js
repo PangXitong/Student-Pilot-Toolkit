@@ -4,11 +4,30 @@ Page({
     maxHeartRate: '',
     heartRateZones: [],
     showResult: false,
-    history: []
+    history: [],
+    isMember: false // 会员状态
+  },
+
+  onShow() {
+    this.checkMemberStatus();
   },
 
   onLoad() {
     this.loadHistory();
+    this.checkMemberStatus();
+  },
+
+  checkMemberStatus() {
+    try {
+      const expireTime = wx.getStorageSync('memberExpireTime');
+      if (expireTime && Date.now() < parseInt(expireTime)) {
+        this.setData({ isMember: true });
+      } else {
+        this.setData({ isMember: false });
+      }
+    } catch (e) {
+      console.error('获取会员状态失败', e);
+    }
   },
 
   onAgeInput(e) {

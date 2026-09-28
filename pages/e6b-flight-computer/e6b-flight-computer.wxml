@@ -62,6 +62,10 @@
           <view class="result-value">{{results.heading || '-'}}</view>
         </view>
       </view>
+      <!-- 广告（会员隐藏） -->
+      <view class="ad-wrapper" style="width: 100%;margin-top: 20rpx;" wx:if="{{!isMember}}">
+        <ad-custom unit-id="adunit-2d6a3185151841c7" bindload="adLoad" binderror="adError" bindclose="adClose"></ad-custom>
+      </view>
       <view class="algorithm-section">
         <view class="algorithm-title">使用的算法</view>
         <view class="algorithm-content">

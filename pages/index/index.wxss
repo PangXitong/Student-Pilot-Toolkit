@@ -39,6 +39,11 @@ page {
   margin-left: 40rpx;
 }
 
+.member-title {
+  color: #0c77e1;
+  font-size: 85rpx;
+}
+
 .search-box {
   background: #e9e9eb;
   border-radius: 20rpx;
@@ -205,6 +210,108 @@ page {
 .tab2-ad-wrapper {
   padding: 0 40rpx 200rpx;
   box-sizing: border-box;
+}
+
+
+
+.member-expire-section {
+  margin: 32rpx 40rpx;
+  text-align: left;
+}
+
+.expire-info {
+  text-align: left;
+}
+
+.expire-main-text {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #1d1d1f;
+  margin-bottom: 12rpx;
+  text-align: left;
+}
+
+.expire-main-text text {
+  color: #1d1d1f;
+}
+
+.expire-sub-text {
+  font-size: 32rpx;
+  color: #86868b;
+  text-align: left;
+}
+
+.member-benefits-gold {
+  margin: 32rpx 40rpx;
+  padding: 32rpx;
+  background: linear-gradient(135deg, #ffd700 0%, #ffed4a 100%);
+  border-radius: 24rpx;
+  border: 2rpx solid #daa520;
+}
+
+.benefits-title {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #5c4000;
+  margin-bottom: 20rpx;
+}
+
+.benefit-item {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 12rpx 0;
+}
+
+.benefit-item:not(:last-child) {
+  border-bottom: 1rpx solid rgba(218, 165, 32, 0.2);
+}
+
+.benefit-check {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  color: #b8860b;
+  font-size: 24rpx;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.benefit-text {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #5c4000;
+  line-height: 1.4;
+}
+
+.member-note-text {
+  margin: 24rpx 40rpx;
+  font-size: 25rpx;
+  color: #86868b;
+  line-height: 1.6;
+}
+
+.watch-ad-btn {
+  margin: 24rpx 40rpx;
+  padding: 24rpx 40rpx;
+  background: linear-gradient(135deg, #34c759 0%, #30d158 100%);
+  border-radius: 40rpx;
+  border: 2rpx solid #248a3d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8rpx 24rpx rgba(52, 199, 89, 0.4);
+}
+
+.btn-text {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #ffffff;
+  text-align: center;
 }
 
 

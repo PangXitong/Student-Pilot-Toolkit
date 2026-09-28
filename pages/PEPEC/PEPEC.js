@@ -48,6 +48,57 @@ Page({
     showModePicker: false,
     searchKeyword: '',
     scrollIntoViewId: '',
+    isMember: false // 会员状态
+  },
+
+  onShow() {
+    this.checkMemberStatus();
+  },
+
+  onLoad() {
+    this.checkMemberStatus();
+    this.audioContext = wx.createInnerAudioContext();
+    this.audioContext.autoplay = false;
+    this.audioContext.playbackRate = 1.0;
+    // iOS需要设置这些属性
+    this.audioContext.obeyMuteSwitch = false; // 忽略静音开关
+    this.audioContext.volume = 1.0; // 设置最大音量
+    
+    // 初始化录音管理器
+    this.recorderManager = wx.getRecorderManager();
+    this.initRecorderManager();
+    
+    // 初始化录音播放上下文
+    this.recordingAudioContext = wx.createInnerAudioContext();
+    this.initRecordingAudioContext();
+    
+    // 加载本地存储的文件列表
+    this.loadAudioList();
+    // 加载本地存储的录音列表
+    this.loadRecordingList();
+    // 原文映射表：优先读缓存，无缓存则待用户手动获取
+    const cached = wx.getStorageSync('pepec_text_cache');
+    if (cached) {
+      this.sentenceMap = cached;
+      this.setData({ sentenceLoaded: true });
+    } else {
+      this.sentenceMap = null;
+    }
+    
+    this.checkMemberStatus();
+  },
+
+  checkMemberStatus() {
+    try {
+      const expireTime = wx.getStorageSync('memberExpireTime');
+      if (expireTime && Date.now() < parseInt(expireTime)) {
+        this.setData({ isMember: true });
+      } else {
+        this.setData({ isMember: false });
+      }
+    } catch (e) {
+      console.error('获取会员状态失败', e);
+    }
   },
 
   audioContext: null,
@@ -586,6 +637,17 @@ Page({
     return `${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
   },
 
+  // 原生模板广告事件处理
+  adLoad() {
+    console.log('原生模板广告加载成功')
+  },
+  adError(err) {
+    console.error('原生模板广告加载失败', err)
+  },
+  adClose() {
+    console.log('原生模板广告关闭')
+  },
+
   // ---------- 分享功能 ----------
   onShareAppMessage() {
     return {
@@ -603,8 +665,8 @@ Page({
     };
   },
 
-  // 从线上导入全部文件
-  onImportOnline() {
+  // 打开导入弹窗
+  onOpenImportModal() {
     this.setData({ showInputModal: true });
   },
 

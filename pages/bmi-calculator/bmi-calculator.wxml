@@ -28,6 +28,11 @@
       <text class="result-description">{{bmiDescription}}</text>
     </view>
 
+    <!-- 广告（会员隐藏） -->
+    <view class="ad-wrapper" style="width: 100%;margin-top: 20rpx;" wx:if="{{!isMember}}">
+      <ad-custom unit-id="adunit-bd819a878ccd8387" bindload="adLoad" binderror="adError" bindclose="adClose"></ad-custom>
+    </view>
+
     <!-- 历史记录区域 -->
     <view class="history-section">
       <view class="history-header">

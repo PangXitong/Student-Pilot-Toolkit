@@ -45,6 +45,11 @@
       </view>
     </view>
     
+    <!-- 广告（会员隐藏） -->
+    <view class="ad-wrapper" style="width: 100%;margin-top: 20rpx;" wx:if="{{!isMember}}">
+      <ad-custom unit-id="adunit-2d6a3185151841c7" bindload="adLoad" binderror="adError" bindclose="adClose"></ad-custom>
+    </view>
+    
     <!-- 当地时间转UTC -->
     <view class="calculator-section">
       <view class="section-title">当地时间 → UTC</view>
