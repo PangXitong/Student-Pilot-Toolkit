@@ -1,0 +1,191 @@
+/* dictionary.wxss - 民航词典页面样式 */
+
+.page {
+  min-height: 100vh;
+  background-color: #f5f7fa;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+/* 搜索区域 */
+.search-section {
+  padding: 24rpx 24rpx 16rpx;
+  background: #ffffff;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
+}
+
+.search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-input {
+  flex: 1;
+  height: 80rpx;
+  font-size: 30rpx;
+  background-color: #f5f5f5;
+  border-radius: 16rpx;
+  padding: 0 50rpx 0 32rpx;
+  box-sizing: border-box;
+}
+
+.clear-btn {
+  position: absolute;
+  right: 16rpx;
+  width: 50rpx;
+  height: 50rpx;
+  line-height: 50rpx;
+  text-align: center;
+  font-size: 36rpx;
+  color: #999;
+  background-color: #ddd;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.clear-btn:active {
+  background-color: #bbb;
+}
+
+.search-result-count {
+  margin-top: 12rpx;
+  font-size: 24rpx;
+  color: #999;
+  padding-left: 8rpx;
+}
+
+/* 结果列表 */
+.result-list {
+  padding: 16rpx 24rpx;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.result-item {
+  background: #ffffff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 16rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
+  transition: all 0.2s ease;
+}
+
+.result-item:active {
+  transform: scale(0.98);
+  box-shadow: 0 4rpx 16rpx rgba(24, 144, 255, 0.15);
+}
+
+.item-header {
+  margin-bottom: 16rpx;
+  padding-bottom: 16rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.item-word {
+  font-size: 34rpx;
+  font-weight: bold;
+  color: #1890ff;
+  word-break: break-all;
+}
+
+.item-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.item-row {
+  display: flex;
+  align-items: flex-start;
+  font-size: 28rpx;
+}
+
+.label {
+  color: #999;
+  font-weight: 500;
+  flex-shrink: 0;
+  min-width: 100rpx;
+}
+
+.value {
+  color: #333;
+  line-height: 1.5;
+  word-break: break-all;
+}
+
+.item-highlight {
+  margin-top: 12rpx;
+  padding: 8rpx 16rpx;
+  background: #e6f4ff;
+  border-radius: 8rpx;
+  border-left: 4rpx solid #1890ff;
+}
+
+.highlight-text {
+  font-size: 24rpx;
+  color: #1890ff;
+}
+
+/* 初始状态 */
+.initial-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 100rpx 40rpx 60rpx;
+  text-align: center;
+}
+
+.initial-title {
+  font-size: 44rpx;
+  font-weight: bold;
+  color: #1890ff;
+  margin-bottom: 32rpx;
+}
+
+.initial-desc {
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 32rpx;
+}
+
+.initial-tags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16rpx;
+  margin-bottom: 32rpx;
+}
+
+.tag-item {
+  font-size: 26rpx;
+  color: #333;
+  background: #e6f4ff;
+  padding: 10rpx 24rpx;
+  border-radius: 24rpx;
+  border: 1rpx solid #bae7ff;
+}
+
+.initial-hint {
+  font-size: 24rpx;
+  color: #999;
+  line-height: 1.6;
+  max-width: 600rpx;
+}
+
+/* 广告 - 全宽居中 */
+.ad-full-width {
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  background: #ffffff;
+  margin-top: 20rpx;
+  padding: 20rpx 0 0;
+}
+
+.ad-full-width ad-custom {
+  width: 100% !important;
+  display: block;
+}

@@ -5,6 +5,11 @@
 // ================================================================
 var JSZip = require('../../utils/jszip-wrapper.js');
 
+// ================================================================
+// 网络请求（带备份域名链）
+// ================================================================
+var { requestWithFallback } = require('../../utils/util.js');
+
 
 // ================================================================
 // 页面逻辑
@@ -99,6 +104,50 @@ Page({
     } catch (e) {
       console.error('获取会员状态失败', e);
     }
+  },
+
+  /**
+   * 带备份域名链的通用请求
+   * @param {string} path - 相对路径
+   * @param {function} onSuccess - 成功回调 (resolvedUrl, response) => {}
+   * @param {function} onFail   - 失败回调 () => {}
+   */
+  requestSorted(path, onSuccess, onFail) {
+    const origins = [
+      'https://ot7atswad4sr.ngrok.xiaomiqiu123.top',
+      'https://icao.oldsai.cn',
+      'https://icao.iepose.cn:443'
+    ]
+    let idx = 0
+
+    const tryNext = () => {
+      if (idx >= origins.length) {
+        if (onFail) onFail()
+        return
+      }
+      const baseUrl = origins[idx]
+      const url = baseUrl + path
+
+      wx.request({
+        url: url,
+        method: 'GET',
+        timeout: 15000,
+        success: (res) => {
+          if (res.statusCode === 200) {
+            if (onSuccess) onSuccess(baseUrl, res)
+          } else {
+            idx++
+            tryNext()
+          }
+        },
+        fail: () => {
+          idx++
+          tryNext()
+        }
+      })
+    }
+
+    tryNext()
   },
 
   audioContext: null,
@@ -342,11 +391,10 @@ Page({
   // ---------- 远程获取原文 ----------
   onFetchText() {
     if (this.sentenceMap) return; // 已加载，避免重复请求
-    wx.request({
-      url: 'https://ot7atswad4sr.ngrok.xiaomiqiu123.top/text.json',
+    requestWithFallback('/text.json', {
       method: 'GET',
       success: (res) => {
-        if (res.statusCode === 200 && res.data) {
+        if (res.data) {
           this.sentenceMap = res.data;
           wx.setStorageSync('pepec_text_cache', res.data);
           this.setData({ sentenceLoaded: true });
@@ -357,7 +405,7 @@ Page({
         }
       },
       fail: () => {
-        wx.showToast({ title: '加载失败，请检查网络', icon: 'none' });
+        wx.showToast({ title: '所有链接不可用，请检查网络', icon: 'none' });
       }
     });
   },
@@ -720,13 +768,9 @@ Page({
   _importOnlineFilesSorted() {
     wx.showLoading({ title: '正在获取排序版文件列表...' });
 
-    const baseUrl = 'https://ot7atswad4sr.ngrok.xiaomiqiu123.top';
-    const fileListUrl = `${baseUrl}/排序版.json`;
-
-    wx.request({
-      url: fileListUrl,
-      success: (res) => {
-        if (res.statusCode === 200 && res.data && res.data.files) {
+    this.requestSorted('/排序版.json',
+      (resolvedBaseUrl, res) => {
+        if (res.data && res.data.files) {
           const files = res.data.files;
           console.log('获取排序版文件列表成功，共', files.length, '个文件');
 
@@ -760,7 +804,7 @@ Page({
               });
             } else {
               // 新文件：使用网络URL
-              const fileUrl = `${baseUrl}/${fileName}`;
+              const fileUrl = `${resolvedBaseUrl}/${fileName}`;
               newFiles.push({ name: fileName, audioSrc: fileUrl, displayName: displayName });
             }
           }
@@ -805,27 +849,21 @@ Page({
           wx.showToast({ title: '获取排序版文件列表失败', icon: 'none' });
         }
       },
-      fail: (err) => {
+      () => {
         wx.hideLoading();
-        console.error('获取排序版文件列表失败', err);
         wx.showToast({ title: '获取排序版文件列表失败', icon: 'none' });
-      },
-    });
+      }
+    );
   },
 
   _importOnlineFiles() {
     wx.showLoading({ title: '正在获取文件列表...' });
     
-    const baseUrl = 'https://ot7atswad4sr.ngrok.xiaomiqiu123.top';
-    const fileListUrl = `${baseUrl}/files.json`;
-    const newFiles = [];
-    
-    // 先获取文件列表
-    wx.request({
-      url: fileListUrl,
-      success: (res) => {
-        if (res.statusCode === 200 && res.data && res.data.files) {
+    this.requestSorted('/files.json',
+      (resolvedBaseUrl, res) => {
+        if (res.data && res.data.files) {
           const files = res.data.files;
+          const newFiles = [];
           console.log('获取文件列表成功，共', files.length, '个文件');
           
           // 使用循环方式处理文件，避免递归导致栈溢出
@@ -843,7 +881,7 @@ Page({
             }
             
             const fileName = files[index];
-            const fileUrl = `${baseUrl}/${fileName}`;
+            const fileUrl = `${resolvedBaseUrl}/${fileName}`;
             
             // 直接使用网络 URL 播放，不下载到本地
             newFiles.push({ name: fileName, audioSrc: fileUrl, displayName: this._getDisplayName(fileName) });
@@ -860,12 +898,11 @@ Page({
           wx.showToast({ title: '获取文件列表失败', icon: 'none' });
         }
       },
-      fail: (err) => {
+      () => {
         wx.hideLoading();
-        console.error('获取文件列表失败', err);
         wx.showToast({ title: '获取文件列表失败', icon: 'none' });
-      },
-    });
+      }
+    );
   },
 
   // ---------- ZIP 文件导入 ----------

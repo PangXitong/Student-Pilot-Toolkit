@@ -1,0 +1,67 @@
+<!-- dictionary.wxml - 民航词典页面 -->
+<view class="page">
+  <!-- 搜索区域 -->
+  <view class="search-section">
+    <view class="search-box">
+      <input
+        class="search-input"
+        placeholder="输入单词、短语、汉语或缩写搜索"
+        value="{{searchKeyword}}"
+        bindinput="onSearchInput"
+        bindconfirm="onSearchConfirm"
+        confirm-type="search"
+      />
+      <view class="clear-btn" wx:if="{{searchKeyword}}" bindtap="onClearSearch">×</view>
+    </view>
+    <view class="search-result-count" wx:if="{{searchKeyword && searchResults.length >= 0}}">
+      找到 {{searchResults.length}} 条结果
+    </view>
+  </view>
+
+  <!-- 搜索结果列表 -->
+  <view class="result-list" wx:if="{{searchKeyword}}">
+    <view class="result-item" wx:for="{{searchResults}}" wx:key="id" bindtap="onItemTap" data-index="{{index}}">
+      <view class="item-header">
+        <text class="item-word">{{item.english}}</text>
+      </view>
+      <view class="item-content">
+        <view class="item-row" wx:if="{{item.abbreviation}}">
+          <text class="label">缩写：</text>
+          <text class="value">{{item.abbreviation}}</text>
+        </view>
+        <view class="item-row" wx:if="{{item.chinese}}">
+          <text class="label">中文：</text>
+          <text class="value">{{item.chinese}}</text>
+        </view>
+      </view>
+      <view class="item-highlight" wx:if="{{highlightType && highlightType === index}}">
+        <text class="highlight-text">已选中：{{highlightText}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{searchKeyword && searchResults.length === 0}}">
+    <text class="empty-text">未找到相关词条</text>
+  </view>
+
+  <!-- 初始提示 -->
+  <view class="initial-state" wx:if="{{!searchKeyword}}">
+    <text class="initial-title">民航词典</text>
+    <text class="initial-desc">支持模糊搜索，输入以下内容即可查询：</text>
+    <view class="initial-tags">
+      <view class="tag-item">✈️ 英语单词</view>
+      <view class="tag-item">📝 英文短语</view>
+      <view class="tag-item">🔤 缩写</view>
+      <view class="tag-item">🌍 中文翻译</view>
+      <view class="tag-item">🏢 机场名称</view>
+      <view class="tag-item">🗺️ 标准术语</view>
+    </view>
+    <text class="initial-hint">例如：输入 "FL"、"Flight Level"、"飞行高度层"、"长春"、"龙嘉"、“CGQ” 或 “ZYCC” 等</text>
+  </view>
+
+  <!-- 广告（会员隐藏，全宽居中） -->
+  <view class="ad-full-width" wx:if="{{!isMember}}">
+    <ad-custom unit-id="adunit-91990ebf57dc923d" bindload="adLoad" binderror="adError" bindclose="adClose"></ad-custom>
+  </view>
+</view>
