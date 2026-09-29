@@ -12,7 +12,8 @@ Page({
     searchKeyword: '',
     isMember: false,
     highlightType: null,
-    highlightText: ''
+    highlightText: '',
+    isRefreshing: false
   },
 
   onLoad() {
@@ -37,26 +38,32 @@ Page({
     }
   },
 
-  fetchDictionaryData() {
-    try {
-      const cached = wx.getStorageSync('dictionary_cache');
-      if (cached && Array.isArray(cached) && cached.length > 0) {
-        // 有缓存，直接使用
-        this.setData({ dictionaryData: cached });
-        console.log('使用本地缓存的词典数据，共', cached.length, '条');
-        return;
+  fetchDictionaryData(forceRefresh) {
+    if (!forceRefresh) {
+      try {
+        const cached = wx.getStorageSync('dictionary_cache');
+        if (cached && Array.isArray(cached) && cached.length > 0) {
+          // 有缓存，直接使用
+          this.setData({ dictionaryData: cached });
+          console.log('使用本地缓存的词典数据，共', cached.length, '条');
+          return;
+        }
+      } catch (e) {
+        console.warn('读取缓存失败', e);
       }
-    } catch (e) {
-      console.warn('读取缓存失败', e);
     }
 
-    // 无缓存，从网络加载
-    wx.showLoading({ title: '加载中...' });
+    // 无缓存或强制刷新，从网络加载
+    wx.showLoading({ title: forceRefresh ? '正在更新词库...' : '加载中...' });
+    if (forceRefresh) {
+      this.setData({ isRefreshing: true });
+    }
 
     requestWithFallback('/dictionary.json', {
       method: 'GET',
       success: (res) => {
         wx.hideLoading();
+        this.setData({ isRefreshing: false });
         if (res.data && Array.isArray(res.data)) {
           const dataWithId = res.data.map((item, index) => ({
             id: index,
@@ -64,7 +71,7 @@ Page({
             abbreviation: item.abbreviation || item.Abbreviation || item.abb || item.AB || '',
             chinese: item.chinese || item.Chinese || item.cn || item.CN || ''
           }));
-          // 保存到本地缓存
+          // 保存到本地缓存（覆盖旧缓存）
           try {
             wx.setStorageSync('dictionary_cache', dataWithId);
             console.log('词典数据已缓存，共', dataWithId.length, '条');
@@ -72,13 +79,37 @@ Page({
             console.warn('保存缓存失败', e);
           }
           this.setData({ dictionaryData: dataWithId });
+
+          if (forceRefresh) {
+            // 刷新后按当前关键词重新搜索
+            if (this.data.searchKeyword) {
+              this.searchDictionary(this.data.searchKeyword.toLowerCase());
+            }
+            wx.showToast({ title: `词库已更新，共${dataWithId.length}条`, icon: 'success' });
+          }
         } else {
-          wx.showToast({ title: '加载词典数据失败', icon: 'none' });
+          wx.showToast({ title: '词库数据格式错误', icon: 'none' });
         }
       },
       fail: () => {
         wx.hideLoading();
+        this.setData({ isRefreshing: false });
         wx.showToast({ title: '所有链接不可用，请检查网络', icon: 'none' });
+      }
+    });
+  },
+
+  // 刷新按钮：强制下载最新的 JSON 覆盖本地缓存
+  onRefreshDictionary() {
+    if (this.data.isRefreshing) return;
+    wx.showModal({
+      title: '更新词库',
+      content: '将从服务器重新下载最新词库并覆盖本地缓存，是否继续？',
+      confirmText: '更新',
+      success: (res) => {
+        if (res.confirm) {
+          this.fetchDictionaryData(true);
+        }
       }
     });
   },

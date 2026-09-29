@@ -47,7 +47,13 @@
 
   <!-- 初始提示 -->
   <view class="initial-state" wx:if="{{!searchKeyword}}">
-    <text class="initial-title">民航词典</text>
+    <view class="initial-title-row">
+      <text class="initial-title">民航词典</text>
+      <view class="refresh-btn {{isRefreshing ? 'refreshing' : ''}}" bindtap="onRefreshDictionary">
+        <text class="refresh-icon">🔄</text>
+        <text class="refresh-text">{{isRefreshing ? '更新中' : '刷新'}}</text>
+      </view>
+    </view>
     <text class="initial-desc">支持模糊搜索，输入以下内容即可查询：</text>
     <view class="initial-tags">
       <view class="tag-item">✈️ 英语单词</view>
@@ -57,7 +63,7 @@
       <view class="tag-item">🏢 机场名称</view>
       <view class="tag-item">🗺️ 标准术语</view>
     </view>
-    <text class="initial-hint">例如：输入 "FL"、"Flight Level"、"飞行高度层"、"长春"、"龙嘉"、“CGQ” 或 “ZYCC” 等</text>
+    <text class="initial-hint">例如：输入 "FL"、"Flight Level"、"飞行高度层"、"长春"、"龙嘉"、“CHANGCHUN” 或 “ZYCC” 等</text>
   </view>
 
   <!-- 广告（会员隐藏，全宽居中） -->

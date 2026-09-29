@@ -137,11 +137,62 @@
   text-align: center;
 }
 
+.initial-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20rpx;
+  margin-bottom: 32rpx;
+}
+
 .initial-title {
   font-size: 44rpx;
   font-weight: bold;
   color: #1890ff;
-  margin-bottom: 32rpx;
+}
+
+/* 刷新按钮 */
+.refresh-btn {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  padding: 8rpx 20rpx;
+  background: #e6f4ff;
+  border: 1rpx solid #91caff;
+  border-radius: 28rpx;
+  transition: all 0.2s ease;
+}
+
+.refresh-btn:active {
+  background: #bae7ff;
+  transform: scale(0.96);
+}
+
+.refresh-icon {
+  font-size: 28rpx;
+}
+
+.refresh-text {
+  font-size: 26rpx;
+  color: #1890ff;
+  font-weight: 500;
+}
+
+.refresh-btn.refreshing {
+  opacity: 0.6;
+}
+
+.refresh-btn.refreshing .refresh-icon {
+  animation: refresh-spin 1s linear infinite;
+}
+
+@keyframes refresh-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .initial-desc {
