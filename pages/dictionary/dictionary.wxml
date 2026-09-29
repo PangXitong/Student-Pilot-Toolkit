@@ -33,6 +33,14 @@
           <text class="label">中文：</text>
           <text class="value">{{item.chinese}}</text>
         </view>
+        <view class="item-row item-row-full" wx:if="{{item.cnexplain}}">
+          <text class="label">中文解释：</text>
+          <text class="value value-explain">{{item.cnexplain}}</text>
+        </view>
+        <view class="item-row item-row-full" wx:if="{{item.enexplain}}">
+          <text class="label">英文解释：</text>
+          <text class="value value-explain">{{item.enexplain}}</text>
+        </view>
       </view>
       <view class="item-highlight" wx:if="{{highlightType && highlightType === index}}">
         <text class="highlight-text">已选中：{{highlightText}}</text>

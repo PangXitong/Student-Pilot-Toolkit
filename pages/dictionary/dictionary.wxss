@@ -115,6 +115,19 @@
   word-break: break-all;
 }
 
+/* 长解释行：标签更宽，文字换行更紧凑 */
+.item-row-full {
+  margin-top: 8rpx;
+  padding-top: 12rpx;
+  border-top: 1rpx dashed #f0f0f0;
+}
+
+.value-explain {
+  font-size: 26rpx;
+  color: #555;
+  line-height: 1.7;
+}
+
 .item-highlight {
   margin-top: 12rpx;
   padding: 8rpx 16rpx;
