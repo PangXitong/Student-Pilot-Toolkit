@@ -273,13 +273,30 @@ Page({
   onChipTap(e) {
     if (this.data.generating) return;
     const phase = e.currentTarget.dataset.phase;
+    const mode = this.data.mode;
     const picks = this.data.picks.slice();
     const i = picks.indexOf(phase);
 
     if (i >= 0) {
-      picks.splice(i, 1);
-    } else if (picks.length >= this.slotsFor(this.data.mode)) {
-      return;
+      // 取消选中：若取消的是第一个，第二个格子也必须一并清掉
+      // （否则会留下一个「起始阶段之前」的终点，区间不成立）
+      if (mode === 'range' && i === 0) {
+        picks.length = 0;
+      } else {
+        picks.splice(i, 1);
+      }
+    } else if (picks.length >= this.slotsFor(mode)) {
+      // 格子已满。range 模式下允许改选第二个格子（终点），不影响起点
+      if (mode === 'range') {
+        if (!this.isAfterStart(phase, picks[0])) return;
+        picks[1] = phase;
+      } else {
+        return;
+      }
+    } else if (mode === 'range' && picks.length === 1) {
+      // 正在选第二个格子（终点）：只接受排在起点之后的阶段
+      if (!this.isAfterStart(phase, picks[0])) return;
+      picks.push(phase);
     } else {
       picks.push(phase);   // 先点的进前一个格子
     }
@@ -288,17 +305,39 @@ Page({
     this.renderSetup();
   },
 
-  /** 当前模式下每个阶段的选中/禁用状态，供 WXML 渲染 chip 样式 */
+  /** 阶段 b 是否排在阶段 a 之后（用于 range 模式限定终点可选范围） */
+  isAfterStart(phase, startPhase) {
+    const a = PHASES.indexOf(startPhase);
+    const b = PHASES.indexOf(phase);
+    if (a < 0 || b < 0) return false;
+    return b > a;
+  },
+
+  /**
+   * 当前模式下每个阶段的选中/禁用状态，供 WXML 渲染 chip 样式。
+   * range 模式下第二个格子只能在起点之后的阶段里选，
+   * 所以起点之前的（含起点本身）一律置灰。
+   */
   buildChips() {
     const picks = this.data.picks;
-    const max = this.slotsFor(this.data.mode);
+    const mode = this.data.mode;
+    const max = this.slotsFor(mode);
+    const startPhase = mode === 'range' ? picks[0] : '';
+
     return PHASES.map((p) => {
       const selected = picks.indexOf(p) >= 0;
-      return {
-        name: p,
-        selected: selected,
-        disabled: !selected && picks.length >= max
-      };
+      let disabled = false;
+
+      if (!selected) {
+        if (mode === 'range' && startPhase) {
+          // 起点已定：只允许选它后面的阶段作为终点
+          disabled = !this.isAfterStart(p, startPhase);
+        } else {
+          disabled = picks.length >= max;
+        }
+      }
+
+      return { name: p, selected: selected, disabled: disabled };
     });
   },
 
@@ -343,14 +382,18 @@ Page({
   // ================================================================
   //  3. 对话渲染
   // ================================================================
-  /** 追加一条气泡，返回其在 messages 中的索引 */
-  pushBubble(role, text, reason) {
+  /**
+   * 追加一条气泡，返回其在 messages 中的索引
+   * @param {boolean} pending - 是否处于等待模型返回的状态（显示转圈）
+   */
+  pushBubble(role, text, reason, pending) {
     const messages = this.data.messages.concat([{
       id: ++this.msgSeq,
       role: role,
       text: text || '',
       reason: reason || '',
       typing: false,
+      pending: !!pending,
       showReason: false
     }]);
     this.setData({ messages: messages, chatTip: '' });
@@ -470,14 +513,16 @@ Page({
     this.setData({ inputValue: '', generating: true });
     this.syncSendState();
 
-    // 先放一个空气泡，等模型返回后逐字打出
-    const aiIndex = this.pushBubble('assistant', '');
+    // 先放一个空气泡并显示转圈，等模型返回后逐字打出
+    const aiIndex = this.pushBubble('assistant', '', '', true);
 
     this.requestChat(
       this.history,
       (answer, reason) => {
         const text = answer || '(无返回内容)';
         this.history.push({ role: 'assistant', content: answer || '' });
+        // 内容已到，撤掉转圈再开始打字
+        this.updateBubble(aiIndex, { pending: false });
         this.typeOut(aiIndex, text, reason);
       },
       (errMsg, status) => {
@@ -542,8 +587,15 @@ Page({
 
     this.clearTypeTimer();
     const last = this.data.messages.length - 1;
-    if (last >= 0 && this.data.messages[last].typing) {
-      this.updateBubble(last, { typing: false });
+    if (last >= 0) {
+      const msg = this.data.messages[last];
+      // 等待中的转圈也要一并撤掉，否则会一直转
+      if (msg.typing || msg.pending) {
+        const patch = {};
+        if (msg.typing) patch.typing = false;
+        if (msg.pending) patch.pending = false;
+        this.updateBubble(last, patch);
+      }
     }
     this.setData({ generating: false });
     this.syncSendState();
@@ -559,13 +611,9 @@ Page({
   },
 
   // ================================================================
-  //  6. 开始新对话
+  //  6. 重置会话
   // ================================================================
-  newConversation() {
-    this.resetConversation();
-    wx.showToast({ title: '已开始新对话', icon: 'none' });
-  },
-
+  /** 清空当前会话，回到「未开始」状态（重新选模式/阶段时会用到） */
   resetConversation() {
     this.clearTypeTimer();
     this.history = [];
