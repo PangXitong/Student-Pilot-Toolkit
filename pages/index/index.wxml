@@ -63,6 +63,16 @@
               </view>
             </scroll-view>
           </view>
+
+          <view class="tools-section" wx:if="{{internalTools.length > 0}}">
+            <view class="section-title">内部工具</view>
+            <scroll-view class="tools-scroll" scroll-x="true" show-scrollbar="false">
+              <view class="tool-item" wx:for="{{internalTools}}" wx:key="id" bindtap="openTool" data-tool="{{item}}">
+                <image class="tool-image" src="{{item.image}}" mode="aspectFill" />
+                <view class="tool-text">{{item.name}}</view>
+              </view>
+            </scroll-view>
+          </view>
         </block>
 
         <block wx:else>

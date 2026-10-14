@@ -20,13 +20,15 @@ Page({
       { id: 'unit-converter', name: '单位换算器', image: '../images/unit-converter.png', url: '../unit-converter/unit-converter', isLink: false },
       { id: 'time-calculator', name: '时间计算器', image: '../images/time.png', url: '../time-calculator/time-calculator', isLink: false },
       { id: 'download-calculator', name: '下载计算器', image: '../images/random.png', url: '../download-calculator/download-calculator', isLink: false },
-      { id: 'random-number', name: '随机数生成器', image: '../images/random.png', url: '../random-number/random-number', isLink: false }
+      { id: 'random-number', name: '随机数生成器', image: '../images/random.png', url: '../random-number/random-number', isLink: false },
+      { id: 'radiotelephony-ai', name: '云塔智联', image: '../images/ai.png', url: '../RadiotelephonyAI/RadiotelephonyAI', isLink: false }
     ],
     filteredTools: [],
     theoryTools: [],
     schoolTools: [],
     utilityTools: [],
-    calculatorTools: []
+    calculatorTools: [],
+    internalTools: []
   },
 
   onShow() {
@@ -73,6 +75,7 @@ Page({
       schoolTools: allTools.filter(t => ['flight-student', 'camera-watermark', 'flight-teacher'].includes(t.id)),
       utilityTools: allTools.filter(t => ['bmi', 'bmr', 'heart-rate'].includes(t.id)),
       calculatorTools: allTools.filter(t => ['unit-converter', 'time-calculator', 'download-calculator', 'random-number'].includes(t.id)),
+      internalTools: allTools.filter(t => ['radiotelephony-ai'].includes(t.id)),
       filteredTools: allTools
     });
     this.checkMemberStatus();

@@ -1,0 +1,139 @@
+<!-- 云塔智联 · PEPEC 陆空通话情景训练 -->
+<view class="page">
+  <!-- 顶栏 -->
+  <view class="header">
+    <view class="logo">云塔智联 · PEPEC 陆空通话训练</view>
+    <view class="btn-header" bindtap="newConversation">开始新对话</view>
+  </view>
+
+  <scroll-view class="scroll" scroll-y scroll-into-view="{{scrollIntoView}}" scroll-with-animation>
+
+    <!-- 模型信息 -->
+    <view class="model-card">
+      <view class="mc-head">
+        <view class="mc-name" bindtap="onCopyModelLink">{{modelName}}</view>
+        <view class="tag">公开</view>
+      </view>
+      <view class="meta">
+        <view class="meta-row"><view class="meta-dt">所有者</view><view class="meta-dd">PangXitong</view></view>
+        <view class="meta-row"><view class="meta-dt">Licence</view><view class="meta-dd">apache-2.0</view></view>
+        <view class="meta-row"><view class="meta-dt">是否公开</view><view class="meta-dd">公开</view></view>
+        <view class="meta-row"><view class="meta-dt">模型描述</view><view class="meta-dd desc">只会说英语陆空通话的模型，扮演管制员，与飞行员（用户）进行对话，模拟PEPEC考试</view></view>
+      </view>
+      <view class="mc-actions">
+        <view class="btn" bindtap="onCopyModelLink">前往 ModelScope 查看模型</view>
+      </view>
+    </view>
+
+    <!-- 访问代码（白名单）：不验证也能看整个页面，只是接口会拒绝返回结果 -->
+    <view class="panel">
+      <view class="panel-title">访问代码</view>
+      <view class="hint">此页面为内部工具，不开放公众使用，内部人员需要使用庞玺桐分发的访问代码进行验证，模型才会返回结果。验证通过后会记住在本机，下次进入无需重新验证。</view>
+
+      <view class="auth-row">
+        <input
+          class="auth-input"
+          type="text"
+          placeholder="请输入访问代码"
+          placeholder-class="gate-placeholder"
+          value="{{codeInput}}"
+          disabled="{{verifying}}"
+          confirm-type="done"
+          bindinput="onCodeInput"
+          bindconfirm="onVerifyTap"
+        />
+        <view class="btn {{verifying ? 'btn-disabled' : ''}}" bindtap="onVerifyTap">
+          {{verifying ? '验证中…' : (verified ? '更换代码' : '验证')}}
+        </view>
+      </view>
+
+      <view class="auth-tip {{authTipBad ? 'bad' : (verified ? 'ok' : '')}}">{{authTip}}</view>
+
+      <view class="auth-logout" wx:if="{{verified}}" bindtap="onLogout">退出验证</view>
+    </view>
+
+    <!-- 训练模式 -->
+    <view class="panel">
+      <view class="panel-title">选择训练模式</view>
+      <view class="hint">第一条消息由系统按你选的模式/阶段生成，点下面的按钮发出后即可自由输入对话。</view>
+
+      <view class="modes">
+        <view class="mode {{mode === 'single' ? 'active' : ''}}" data-mode="single" bindtap="onModeTap">
+          <view class="mode-main">Start training……</view>
+          <view class="mode-sub">单个阶段</view>
+        </view>
+        <view class="mode {{mode === 'from' ? 'active' : ''}}" data-mode="from" bindtap="onModeTap">
+          <view class="mode-main">Start training from……</view>
+          <view class="mode-sub">从某阶段开始</view>
+        </view>
+        <view class="mode {{mode === 'range' ? 'active' : ''}}" data-mode="range" bindtap="onModeTap">
+          <view class="mode-main">Start training from……to……</view>
+          <view class="mode-sub">阶段区间（不可重复）</view>
+        </view>
+      </view>
+
+      <view class="chips">
+        <view
+          class="chip {{item.selected ? 'selected' : ''}} {{item.disabled ? 'disabled' : ''}}"
+          wx:for="{{chips}}"
+          wx:key="name"
+          data-phase="{{item.name}}"
+          bindtap="onChipTap"
+        >{{item.name}}</view>
+      </view>
+
+      <view class="preview">
+        <rich-text nodes="{{previewHtml}}"></rich-text>
+      </view>
+
+      <view class="start-row">
+        <view class="btn {{canStart ? '' : 'btn-disabled'}}" bindtap="onStartTap">
+          {{started ? '用新的选择重新开始' : '发送首条训练指令'}}
+        </view>
+        <view class="hint" wx:if="{{startTip}}">{{startTip}}</view>
+      </view>
+    </view>
+
+    <!-- 对话区 -->
+    <view class="chat">
+      <view class="chat-empty" wx:if="{{messages.length === 0}}">{{chatTip}}</view>
+
+      <view
+        class="msg {{item.role}} {{item.role === 'system' ? 'error' : ''}}"
+        wx:for="{{messages}}"
+        wx:key="id"
+        id="msg-{{item.id}}"
+      >
+        <view class="role">
+          {{item.role === 'user' ? '学员 / You' : (item.role === 'assistant' ? '管制 / ATC' : '系统提示')}}
+        </view>
+        <view class="reason" wx:if="{{item.reason}}" data-index="{{index}}" bindtap="onToggleReason">
+          <view class="reason-summary">{{item.showReason ? '▾' : '▸'}} 思考过程</view>
+          <view class="reason-body" wx:if="{{item.showReason}}">{{item.reason}}</view>
+        </view>
+        <view class="bubble">
+          <text>{{item.text}}</text><text class="cursor" wx:if="{{item.typing}}"></text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 输入区 -->
+    <view class="composer">
+      <textarea
+        class="composer-input"
+        value="{{inputValue}}"
+        placeholder="{{started ? '在此输入…' : '选择训练模式并发送首条消息后，即可在此输入…'}}"
+        placeholder-class="gate-placeholder"
+        disabled="{{!canInput}}"
+        auto-height
+        maxlength="-1"
+        cursor-spacing="20"
+        bindinput="onInputChange"
+      />
+      <view class="btn {{canSend ? '' : 'btn-disabled'}}" bindtap="onSendTap">发送</view>
+      <view class="btn ghost" wx:if="{{generating}}" bindtap="onStopTap">停止</view>
+    </view>
+
+    <view class="footer">© 2022-2026 庞玺桐 · 云塔智联平台</view>
+  </scroll-view>
+</view>

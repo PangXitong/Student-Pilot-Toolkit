@@ -1,0 +1,468 @@
+/* 云塔智联 · PEPEC 陆空通话情景训练 */
+page {
+  background: linear-gradient(160deg, #f5f7fa 0%, #c3cfe2 100%);
+  height: 100vh;
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* ==================== 通用按钮 ==================== */
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18rpx 36rpx;
+  border-radius: 40rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #ffffff;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-shadow: 0 8rpx 24rpx rgba(102, 126, 234, 0.35);
+  text-align: center;
+}
+
+.btn.ghost {
+  background: #ffffff;
+  color: #4a5568;
+  border: 1rpx solid #e2e8f0;
+  box-shadow: none;
+}
+
+.btn.btn-disabled {
+  opacity: 0.45;
+  box-shadow: none;
+}
+
+.btn-header {
+  padding: 12rpx 28rpx;
+  border-radius: 32rpx;
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #ffffff;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-shadow: 0 6rpx 16rpx rgba(102, 126, 234, 0.35);
+}
+
+/* ==================== 访问代码（白名单认证） ==================== */
+.auth-row {
+  display: flex;
+  align-items: center;
+  margin-top: 24rpx;
+  gap: 20rpx;
+}
+
+.auth-input {
+  flex: 1;
+  height: 84rpx;
+  box-sizing: border-box;
+  border: 2rpx solid #e2e8f0;
+  border-radius: 18rpx;
+  padding: 0 24rpx;
+  font-size: 29rpx;
+  color: #2d3748;
+  background: #ffffff;
+  letter-spacing: 2rpx;
+}
+
+.auth-row .btn {
+  flex-shrink: 0;
+  padding: 18rpx 40rpx;
+}
+
+.auth-tip {
+  margin-top: 20rpx;
+  font-size: 25rpx;
+  color: #718096;
+  line-height: 1.7;
+}
+
+.auth-tip.ok {
+  color: #15803d;
+}
+
+.auth-tip.bad {
+  color: #c53030;
+}
+
+/* 退出验证：低调的文字按钮 */
+.auth-logout {
+  display: inline-block;
+  margin-top: 20rpx;
+  padding: 10rpx 28rpx;
+  border-radius: 24rpx;
+  border: 1rpx solid #e2e8f0;
+  background: #ffffff;
+  font-size: 24rpx;
+  color: #4a5568;
+}
+
+.gate-placeholder {
+  color: #a0aec0;
+  font-size: 28rpx;
+  letter-spacing: 0;
+}
+
+/* ==================== 顶栏 ==================== */
+.header {
+  display: flex;
+  align-items: center;
+  padding: 24rpx 32rpx;
+  background: #ffffff;
+  border-bottom: 1rpx solid #e2e8f0;
+}
+
+.logo {
+  flex: 1;
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #667eea;
+  letter-spacing: 1rpx;
+}
+
+/* ==================== 滚动主体 ==================== */
+.scroll {
+  flex: 1;
+  height: 0;
+  padding: 32rpx 32rpx 0;
+  box-sizing: border-box;
+}
+
+/* ==================== 模型信息 ==================== */
+.model-card {
+  background: #ffffff;
+  border-radius: 32rpx;
+  box-shadow: 0 12rpx 40rpx rgba(0, 0, 0, 0.08);
+  padding: 32rpx;
+  margin-bottom: 28rpx;
+}
+
+.mc-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 24rpx;
+}
+
+.mc-name {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: #764ba2;
+  margin-right: 16rpx;
+  word-break: break-all;
+}
+
+.tag {
+  font-size: 23rpx;
+  padding: 6rpx 20rpx;
+  border-radius: 24rpx;
+  background: #e6fffa;
+  color: #2c7a7b;
+  border: 1rpx solid #b2f5ea;
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.meta-row {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 14rpx;
+}
+
+.meta-dt {
+  width: 150rpx;
+  flex-shrink: 0;
+  font-size: 27rpx;
+  font-weight: 600;
+  color: #718096;
+  line-height: 1.6;
+}
+
+.meta-dd {
+  flex: 1;
+  font-size: 27rpx;
+  color: #2d3748;
+  line-height: 1.6;
+  word-break: break-all;
+}
+
+.meta-dd.desc {
+  color: #4a5568;
+}
+
+.mc-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 24rpx;
+  gap: 20rpx;
+}
+
+/* ==================== 面板 ==================== */
+.panel {
+  background: #ffffff;
+  border-radius: 32rpx;
+  box-shadow: 0 12rpx 40rpx rgba(0, 0, 0, 0.08);
+  padding: 32rpx;
+  margin-bottom: 28rpx;
+}
+
+.panel-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #2d3748;
+  margin-bottom: 12rpx;
+}
+
+.hint {
+  font-size: 25rpx;
+  color: #718096;
+  line-height: 1.7;
+}
+
+/* 模式选择 */
+.modes {
+  display: flex;
+  flex-direction: column;
+  margin-top: 24rpx;
+}
+
+.mode {
+  border: 2rpx solid #e2e8f0;
+  border-radius: 24rpx;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+  background: #ffffff;
+  box-sizing: border-box;
+}
+
+.mode.active {
+  border-color: #667eea;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+}
+
+.mode-main {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #4a5568;
+  text-align: center;
+}
+
+.mode.active .mode-main {
+  color: #764ba2;
+}
+
+.mode-sub {
+  font-size: 23rpx;
+  color: #718096;
+  text-align: center;
+  margin-top: 8rpx;
+}
+
+/* 阶段标签 */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 8rpx;
+}
+
+.chip {
+  padding: 14rpx 28rpx;
+  border-radius: 36rpx;
+  border: 1rpx solid #e2e8f0;
+  background: #ffffff;
+  font-size: 25rpx;
+  color: #4a5568;
+  margin: 0 16rpx 16rpx 0;
+}
+
+.chip.selected {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: #ffffff;
+  border-color: transparent;
+  box-shadow: 0 6rpx 20rpx rgba(102, 126, 234, 0.35);
+}
+
+.chip.disabled {
+  opacity: 0.4;
+}
+
+/* 句子预览 */
+.preview {
+  margin-top: 12rpx;
+  padding: 28rpx 32rpx;
+  border-radius: 24rpx;
+  background: linear-gradient(135deg, #f6f7f9, #edf2f7);
+  border-left: 8rpx solid #667eea;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #2d3748;
+  line-height: 1.8;
+  word-break: break-word;
+}
+
+/* rich-text 内部节点样式需用内联形式声明，这里借助样式穿透类名兜底 */
+.preview .slot {
+  display: inline-block;
+  min-width: 150rpx;
+  padding: 4rpx 18rpx;
+  margin: 0 4rpx;
+  border-radius: 14rpx;
+  background: #ffffff;
+  border: 1rpx dashed #a0aec0;
+  color: #a0aec0;
+  font-weight: 600;
+  text-align: center;
+}
+
+.preview .slot.filled {
+  border: 1rpx solid #667eea;
+  color: #764ba2;
+  background: #ffffff;
+}
+
+.start-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 28rpx;
+  gap: 20rpx;
+}
+
+/* ==================== 对话区 ==================== */
+.chat {
+  background: #ffffff;
+  border-radius: 32rpx;
+  box-shadow: 0 12rpx 40rpx rgba(0, 0, 0, 0.08);
+  padding: 32rpx;
+  margin-bottom: 24rpx;
+}
+
+.chat-empty {
+  font-size: 26rpx;
+  color: #718096;
+  text-align: center;
+  padding: 80rpx 20rpx;
+  line-height: 1.7;
+}
+
+.msg {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 28rpx;
+}
+
+.msg.user {
+  align-items: flex-end;
+}
+
+.msg.assistant {
+  align-items: flex-start;
+}
+
+.role {
+  font-size: 21rpx;
+  color: #718096;
+  margin-bottom: 8rpx;
+  padding: 0 8rpx;
+}
+
+.bubble {
+  max-width: 84%;
+  padding: 22rpx 30rpx;
+  border-radius: 30rpx;
+  font-size: 29rpx;
+  line-height: 1.75;
+  word-break: break-word;
+}
+
+.msg.user .bubble {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: #ffffff;
+  border-bottom-right-radius: 8rpx;
+}
+
+.msg.assistant .bubble {
+  background: #f1f4f9;
+  color: #2d3748;
+  border-bottom-left-radius: 8rpx;
+}
+
+.msg.error .bubble {
+  background: #fff5f5;
+  color: #c53030;
+  border: 1rpx solid #feb2b2;
+}
+
+.cursor {
+  display: inline-block;
+  width: 12rpx;
+  height: 28rpx;
+  background: #667eea;
+  vertical-align: -4rpx;
+  margin-left: 4rpx;
+  animation: blink 1s steps(2, start) infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* 思考过程 */
+.reason {
+  margin-bottom: 12rpx;
+  max-width: 84%;
+}
+
+.reason-summary {
+  font-size: 23rpx;
+  color: #718096;
+}
+
+.reason-body {
+  margin-top: 12rpx;
+  padding: 16rpx;
+  background: #f7fafc;
+  border-radius: 16rpx;
+  font-size: 23rpx;
+  color: #4a5568;
+  line-height: 1.7;
+  word-break: break-word;
+}
+
+/* ==================== 输入区 ==================== */
+.composer {
+  display: flex;
+  align-items: flex-end;
+  margin-bottom: 24rpx;
+  gap: 20rpx;
+}
+
+.composer-input {
+  flex: 1;
+  min-height: 88rpx;
+  max-height: 280rpx;
+  box-sizing: border-box;
+  border: 2rpx solid #e2e8f0;
+  border-radius: 28rpx;
+  padding: 26rpx 28rpx;
+  font-size: 29rpx;
+  line-height: 1.6;
+  background: #ffffff;
+  color: #2d3748;
+}
+
+.footer {
+  text-align: center;
+  padding: 24rpx 32rpx 60rpx;
+  font-size: 23rpx;
+  color: #666666;
+}

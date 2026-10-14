@@ -22,10 +22,10 @@ const formatNumber = n => {
  */
 const requestWithFallback = (path, options) => {
   const origins = [
-    'https://ot7atswad4sr.ngrok.xiaomiqiu123.top',
+    'https://oldsai.kooldns.cn:443',
     'https://icao.iepose.cn/',
     'https://icao.oldsai.cn',
-    'https://oldsai.kooldns.cn:443'
+    'https://ot7atswad4sr.ngrok.xiaomiqiu123.top'
   ]
   const total = origins.length
   let current = 0
