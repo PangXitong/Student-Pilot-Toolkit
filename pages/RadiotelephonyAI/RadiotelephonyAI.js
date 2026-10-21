@@ -25,12 +25,6 @@ const CONFIG = {
 const TYPE_STEP = 2;
 const TYPE_INTERVAL = 24;
 
-// 训练阶段（顺序即训练流程顺序）
-const PHASES = [
-  'clearance', 'apron', 'taxi out', 'line up', 'take off', 'departure',
-  'cruising', 'descend', 'approaching', 'landing', 'taxi back'
-];
-
 // 访问代码在本机的存储键：验证通过后记住，重进页面免再验证
 const STORAGE_CODE = 'radiotelephony_access_code';
 
@@ -49,20 +43,12 @@ Page({
     modelName: CONFIG.model,
     modelUrl: 'https://www.modelscope.cn/models/PangXitong/Radiotelephony1.0-Pilots-64M/',
 
-    // ---------- 训练模式 ----------
-    mode: 'from',           // single | from | range
-    picks: [],              // 按点击先后排序（初始为空，不替用户预选阶段）
-    phases: PHASES,
-    previewHtml: '',        // 句子预览（富文本，含高亮槽位）
-    canStart: false,        // 首条指令是否可发送
-    startTip: '',
-
     // ---------- 对话 ----------
     started: false,         // 首条消息是否已发送
     messages: [],           // 渲染用的气泡列表 { role, text, reason, typing }
     inputValue: '',
     generating: false,
-    chatTip: '选择训练模式并发送首条指令，开始新的对话。',
+    chatTip: '首次使用请点击下方「开始」按钮发送首条指令，即可开始对话。',
     scrollIntoView: '',
 
     // ---------- 派生的发送权限（已开始训练 + 不在生成中） ----------
@@ -77,10 +63,27 @@ Page({
   msgSeq: 0,
 
   onLoad() {
+    // 开启「分享给朋友」与「分享到朋友圈」两个入口
+    if (wx.showShareMenu) {
+      wx.showShareMenu({
+        withShareTicket: true,
+        menus: ['shareAppMessage', 'shareTimeline']
+      });
+    }
+
     // 先用本机记住的访问代码恢复验证态，再静默复核
     this.restoreAuth();
     this.syncSendState();
-    this.renderSetup();
+  },
+
+  onShow() {
+    // 部分低版本基础库需要每次显示页面时重新开启朋友圈分享入口
+    if (wx.showShareMenu) {
+      wx.showShareMenu({
+        withShareTicket: true,
+        menus: ['shareAppMessage', 'shareTimeline']
+      });
+    }
   },
 
   onUnload() {
@@ -93,14 +96,14 @@ Page({
 
   /**
    * 统一刷新「能否输入 / 能否发送」派生状态。
-   * 首条指令、生成中任一变化都要重新计算，避免各处重复判断。
+   * 开始按钮/发送按钮在未生成时始终可点（首次「开始」不受 started 限制），
+   * 输入框则要在首条指令发出（started）后才能真正输入。
    */
   syncSendState() {
     const { started, generating } = this.data;
-    const can = started && !generating;
     this.setData({
-      canInput: can,
-      canSend: can
+      canInput: started && !generating,
+      canSend: !generating
     });
   },
 
@@ -256,130 +259,6 @@ Page({
   },
 
   // ================================================================
-  //  2. 训练模式 / 阶段选择
-  // ================================================================
-  slotsFor(mode) {
-    return mode === 'range' ? 2 : 1;
-  },
-
-  onModeTap(e) {
-    if (this.data.generating) return;
-    const mode = e.currentTarget.dataset.mode;
-    if (mode === this.data.mode) return;
-    this.setData({ mode: mode, picks: [] });
-    this.renderSetup();
-  },
-
-  onChipTap(e) {
-    if (this.data.generating) return;
-    const phase = e.currentTarget.dataset.phase;
-    const mode = this.data.mode;
-    const picks = this.data.picks.slice();
-    const i = picks.indexOf(phase);
-
-    if (i >= 0) {
-      // 取消选中：若取消的是第一个，第二个格子也必须一并清掉
-      // （否则会留下一个「起始阶段之前」的终点，区间不成立）
-      if (mode === 'range' && i === 0) {
-        picks.length = 0;
-      } else {
-        picks.splice(i, 1);
-      }
-    } else if (picks.length >= this.slotsFor(mode)) {
-      // 格子已满。range 模式下允许改选第二个格子（终点），不影响起点
-      if (mode === 'range') {
-        if (!this.isAfterStart(phase, picks[0])) return;
-        picks[1] = phase;
-      } else {
-        return;
-      }
-    } else if (mode === 'range' && picks.length === 1) {
-      // 正在选第二个格子（终点）：只接受排在起点之后的阶段
-      if (!this.isAfterStart(phase, picks[0])) return;
-      picks.push(phase);
-    } else {
-      picks.push(phase);   // 先点的进前一个格子
-    }
-
-    this.setData({ picks: picks });
-    this.renderSetup();
-  },
-
-  /** 阶段 b 是否排在阶段 a 之后（用于 range 模式限定终点可选范围） */
-  isAfterStart(phase, startPhase) {
-    const a = PHASES.indexOf(startPhase);
-    const b = PHASES.indexOf(phase);
-    if (a < 0 || b < 0) return false;
-    return b > a;
-  },
-
-  /**
-   * 当前模式下每个阶段的选中/禁用状态，供 WXML 渲染 chip 样式。
-   * range 模式下第二个格子只能在起点之后的阶段里选，
-   * 所以起点之前的（含起点本身）一律置灰。
-   */
-  buildChips() {
-    const picks = this.data.picks;
-    const mode = this.data.mode;
-    const max = this.slotsFor(mode);
-    const startPhase = mode === 'range' ? picks[0] : '';
-
-    return PHASES.map((p) => {
-      const selected = picks.indexOf(p) >= 0;
-      let disabled = false;
-
-      if (!selected) {
-        if (mode === 'range' && startPhase) {
-          // 起点已定：只允许选它后面的阶段作为终点
-          disabled = !this.isAfterStart(p, startPhase);
-        } else {
-          disabled = picks.length >= max;
-        }
-      }
-
-      return { name: p, selected: selected, disabled: disabled };
-    });
-  },
-
-  firstMessage() {
-    const a = this.data.picks[0] || '';
-    const b = this.data.picks[1] || '';
-    if (this.data.mode === 'single') return 'Start training ' + a;
-    if (this.data.mode === 'from') return 'Start training from ' + a;
-    return 'Start training from ' + a + ' to ' + b;
-  },
-
-  /** 生成句子预览的富文本（槽位高亮） */
-  renderPreview() {
-    const mode = this.data.mode;
-    const picks = this.data.picks;
-    const slot = (i) => {
-      const v = picks[i] || '';
-      const label = v || (i === 0 ? '阶段一' : '阶段二');
-      return '<span class="slot' + (v ? ' filled' : '') + '">' + label + '</span>';
-    };
-
-    let html;
-    if (mode === 'single') html = 'Start training ' + slot(0);
-    else if (mode === 'from') html = 'Start training from ' + slot(0);
-    else html = 'Start training from ' + slot(0) + ' to ' + slot(1);
-
-    this.setData({ previewHtml: html });
-  },
-
-  renderSetup() {
-    const max = this.slotsFor(this.data.mode);
-    const ready = this.data.picks.length === max;
-
-    this.setData({
-      chips: this.buildChips(),
-      canStart: ready && !this.data.generating,
-      startTip: ready ? '' : '请选择阶段（' + this.data.picks.length + '/' + max + '）'
-    });
-    this.renderPreview();
-  },
-
-  // ================================================================
   //  3. 对话渲染
   // ================================================================
   /**
@@ -473,16 +352,21 @@ Page({
   },
 
   onSendTap() {
+    if (!this.data.started) {
+      // 首次开始：点击「开始」按钮发送固定的首条指令
+      this.start();
+      return;
+    }
     this.send(this.data.inputValue, false);
   },
 
-  onStartTap() {
-    if (this.data.picks.length !== this.slotsFor(this.data.mode)) return;
-    if (this.data.started) {
-      // 训练已开始：改选模式/阶段即视为换一个情景重新开始，先清空当前会话
-      this.resetConversation();
-    }
-    this.send(this.firstMessage(), true);
+  // 首次开始：清空会话后，发送固定的首条指令「Start ICAO test.」
+  start() {
+    if (this.data.started || this.data.generating) return;
+    this.history = [];
+    this.setData({ messages: [], started: true, chatTip: '', inputValue: '' });
+    this.syncSendState();
+    this.send('Start ICAO test.', true);
   },
 
   onStopTap() {
@@ -535,7 +419,6 @@ Page({
           this.setData({ started: false });
         }
         this.syncSendState();
-        this.renderSetup();
 
         let tip = '请检查模型名称、Base URL，或该接口是否允许小程序域名调用（需在微信后台配置 request 合法域名）。';
         if (status === 401 || status === 503) {
@@ -571,7 +454,6 @@ Page({
         this.clearTypeTimer();
         this.setData({ generating: false });
         this.syncSendState();
-        this.renderSetup();
         return;
       }
       this.scrollToBottom();
@@ -599,7 +481,6 @@ Page({
     }
     this.setData({ generating: false });
     this.syncSendState();
-    this.renderSetup();
     wx.showToast({ title: '已停止显示', icon: 'none' });
   },
 
@@ -613,7 +494,7 @@ Page({
   // ================================================================
   //  6. 重置会话
   // ================================================================
-  /** 清空当前会话，回到「未开始」状态（重新选模式/阶段时会用到） */
+  /** 清空当前会话，回到「未开始」状态 */
   resetConversation() {
     this.clearTypeTimer();
     this.history = [];
@@ -622,13 +503,10 @@ Page({
       messages: [],
       inputValue: '',
       generating: false,
-      mode: 'from',
-      picks: [],
-      chatTip: '选择训练模式并发送首条指令，开始新的对话。',
+      chatTip: '首次使用请点击下方「开始」按钮发送首条指令，即可开始对话。',
       scrollIntoView: ''
     });
     this.syncSendState();
-    this.renderSetup();
   },
 
   // ================================================================
@@ -645,6 +523,8 @@ Page({
 
   noop() {},
 
+  // ---------- 分享功能 ----------
+  // 分享给朋友
   onShareAppMessage() {
     return {
       title: '云塔智联 · PEPEC 陆空通话情景训练',
@@ -652,6 +532,7 @@ Page({
     };
   },
 
+  // 分享到朋友圈
   onShareTimeline() {
     return {
       title: '云塔智联 · PEPEC 陆空通话情景训练',

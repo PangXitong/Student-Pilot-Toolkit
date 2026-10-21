@@ -9,9 +9,8 @@
         <view class="tag">公开</view>
       </view>
       <view class="meta">
-        <view class="meta-row"><view class="meta-dt">所有者</view><view class="meta-dd">PangXitong</view></view>
+        <view class="meta-row"><view class="meta-dt">所有者</view><view class="meta-dd">庞玺桐（PangXitong）</view></view>
         <view class="meta-row"><view class="meta-dt">Licence</view><view class="meta-dd">apache-2.0</view></view>
-        <view class="meta-row"><view class="meta-dt">是否公开</view><view class="meta-dd">公开</view></view>
         <view class="meta-row"><view class="meta-dt">模型描述</view><view class="meta-dd desc">只会说英语陆空通话的模型，扮演管制员，与飞行员（用户）进行对话，模拟PEPEC考试</view></view>
       </view>
       <view class="mc-actions">
@@ -44,48 +43,6 @@
       <view class="auth-tip {{authTipBad ? 'bad' : (verified ? 'ok' : '')}}">{{authTip}}</view>
 
       <view class="auth-logout" wx:if="{{verified}}" bindtap="onLogout">退出验证</view>
-    </view>
-
-    <!-- 训练模式 -->
-    <view class="panel">
-      <view class="panel-title">选择训练模式</view>
-      <view class="hint">第一条消息由系统按你选的模式/阶段生成，点下面的按钮发出后即可自由输入对话。</view>
-
-      <view class="modes">
-        <view class="mode {{mode === 'single' ? 'active' : ''}}" data-mode="single" bindtap="onModeTap">
-          <view class="mode-main">Start training……</view>
-          <view class="mode-sub">单个阶段</view>
-        </view>
-        <view class="mode {{mode === 'from' ? 'active' : ''}}" data-mode="from" bindtap="onModeTap">
-          <view class="mode-main">Start training from……</view>
-          <view class="mode-sub">从某阶段开始</view>
-        </view>
-        <view class="mode {{mode === 'range' ? 'active' : ''}}" data-mode="range" bindtap="onModeTap">
-          <view class="mode-main">Start training from……to……</view>
-          <view class="mode-sub">阶段区间</view>
-        </view>
-      </view>
-
-      <view class="chips">
-        <view
-          class="chip {{item.selected ? 'selected' : ''}} {{item.disabled ? 'disabled' : ''}}"
-          wx:for="{{chips}}"
-          wx:key="name"
-          data-phase="{{item.name}}"
-          bindtap="onChipTap"
-        >{{item.name}}</view>
-      </view>
-
-      <view class="preview">
-        <rich-text nodes="{{previewHtml}}"></rich-text>
-      </view>
-
-      <view class="start-row">
-        <view class="btn {{canStart ? '' : 'btn-disabled'}}" bindtap="onStartTap">
-          {{started ? '用新的选择重新开始' : '发送首条训练指令'}}
-        </view>
-        <view class="hint" wx:if="{{startTip}}">{{startTip}}</view>
-      </view>
     </view>
 
     <!-- 对话区 -->
@@ -125,7 +82,7 @@
       <textarea
         class="composer-input"
         value="{{inputValue}}"
-        placeholder="{{started ? '在此输入…' : '选择训练模式并发送首条消息后，即可在此输入…'}}"
+        placeholder="{{started ? '在此输入…' : '点击右侧开始按钮发送首条指令，即可在此输入'}}"
         placeholder-class="gate-placeholder"
         disabled="{{!canInput}}"
         auto-height
@@ -133,7 +90,7 @@
         cursor-spacing="20"
         bindinput="onInputChange"
       />
-      <view class="btn btn-send {{canSend ? '' : 'btn-disabled'}}" bindtap="onSendTap">发送</view>
+      <view class="btn btn-send {{canSend ? '' : 'btn-disabled'}}" bindtap="onSendTap">{{started ? '发送' : '开始'}}</view>
       <view class="btn ghost" wx:if="{{generating}}" bindtap="onStopTap">停止</view>
     </view>
 
